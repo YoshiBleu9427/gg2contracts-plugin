@@ -179,7 +179,7 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                     event_perform(ev_other, Contracts.EVT_SEND_HELLO); // TODO creating it always starts with hello; remove everywhere
                     received_session_token = read_binstring(buf, 16);  // TODO test what happens if client sends bad size
                     _player.Contracts_session_token = received_session_token;
-                    ds_map_add(Contracts.players_by_session_token, received_session_token, _player); // TODO on player destroy, remove from map
+                    ds_map_add(Contracts.players_by_session_token, received_session_token, _player);
                     on_hello_command = Contracts.EVT_SEND_SRV_SERVER_RECEIVES_CLIENT;
                     destroy_on_queue_empty = true;
                 }

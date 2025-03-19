@@ -48,11 +48,11 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
     
     contracts_list = ds_list_create();
     
-    var firsttt, val;
-    firsttt = ds_map_find_first(Contracts.contracts_by_uuid);
-    while (is_string(firsttt)) {
-        val = ds_map_find_value(Contracts.contracts_by_uuid, firsttt);
-        ds_list_add(contracts_list, val);
+    var map_key, map_value;
+    map_key = ds_map_find_first(Contracts.contracts_by_uuid);
+    while (is_string(map_key)) {
+        map_value = ds_map_find_value(Contracts.contracts_by_uuid, map_key);
+        ds_list_add(contracts_list, map_value);
         map_key = ds_map_find_next(Contracts.contracts_by_uuid, map_key);
     }
 ');

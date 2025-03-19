@@ -61,7 +61,7 @@ object_event_add(Contract, ev_create, 0, '
 object_event_add(Contract, ev_step, ev_step_normal, '
     // update description
     description = Contracts.CONTRACT_DESCRIPTION_BY_TYPE[contract_type];
-    description = string_replace(description, "{value}", string(value));
+    description = string_replace(description, "{value}", string(target_value));
     description = string_replace(description, "{class}", classname(game_class));
 ');
 
