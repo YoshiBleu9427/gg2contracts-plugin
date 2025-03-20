@@ -45,17 +45,24 @@ CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_DEBUG]           = "DEBUG"
 
 
 object_event_add(Contract, ev_create, 0, '
-    contract_id = noone;
-    contract_type = noone;
+    contract_id = "";
+    contract_type = 0;
     value = 0;
     target_value = 0;
-    game_class = noone;
+    game_class = 0;
     points = 0;
     completed = false;
+    
     owner = noone;
+    owner_id = "";
+    
     description = "";
     
     value_increment = 0; // how much the contract value changed since receiving it
+');
+
+object_event_add(Contract, ev_destroy, 0, '
+    ds_map_delete(Contracts.contracts_by_uuid, contract_id);
 ');
 
 object_event_add(Contract, ev_step, ev_step_normal, '
@@ -94,6 +101,19 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_DATA_SENT, '
+    // if player left, no point in keeping the contract
+    // now that the update was sent to the backend, it is safe to delete here
+    if (owner == noone) {
+        instance_destroy();
+    } else {
+        // apply the increment server-side, because backend wont send detailed updates
+        value += value_increment;
+        
+        // TODO send plugin packet to owner so that the client may apply the value increment
+    }
+    
     // reset
     value_increment = 0;
 ');
+
+// TODO event that syncs the value increment from server to client during a round

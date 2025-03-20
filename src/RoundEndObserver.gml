@@ -23,7 +23,9 @@ object_event_add(RoundEndObserver, ev_step, ev_step_normal, '
 ');
 
 object_event_add(PlayerControl, ev_step, ev_step_normal, '
-    if (!instance_exists(Contracts.RoundEndObserver)) {
-        instance_create(0, 0, Contracts.RoundEndObserver);
+    if (global.isHost) {
+        if (!instance_exists(Contracts.RoundEndObserver)) {
+            instance_create(0, 0, Contracts.RoundEndObserver);
+        }
     }
 ');

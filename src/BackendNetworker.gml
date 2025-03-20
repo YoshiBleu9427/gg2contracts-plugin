@@ -261,7 +261,7 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_SEND_CLT_NEW_ACCOUNT, '
     write_ubyte(backend_socket, Contracts.NET_BACK_REQ_NEW_ACCOUNT);
     write_ubyte(backend_socket, string_length(global.playerName));
     write_string(backend_socket, global.playerName);
-    write_ubyte(backend_socket, CLASS_SPY);  // TODO
+    write_ubyte(backend_socket, CLASS_SOLDIER);  // TODO
     socket_send(backend_socket);
     
     expected_byte_count += 16;
@@ -278,8 +278,11 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_HANDLE_CLT_NEW_ACCOUNT, '
 
 
 object_event_add(ClientBackendNetworker, ev_other, EVT_SEND_CLT_JOIN_SERVER, '
+    if (string_length(Contracts.joined_server_id) != 16) {
+        show_error("Contracts plugin error: bad length for joined_server_id (EVT_SEND_CLT_JOIN_SERVER)", false);
+    }
     write_ubyte(backend_socket, Contracts.NET_BACK_REQ_JOIN_SERVER);
-    write_binstring(backend_socket, Contracts.server_id);
+    write_binstring(backend_socket, Contracts.joined_server_id);
     socket_send(backend_socket);
     
     expected_byte_count += 16 + 1;
@@ -290,7 +293,6 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_HANDLE_CLT_JOIN_SERVER, '
     switch(command_state) {
         case Contracts.CMD_STATE_INIT:
             Contracts.session_token = read_binstring(backend_socket, 16);
-            gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_SESSION_TOKEN_KEY, hex(Contracts.session_token));
             contract_count = read_ubyte(backend_socket);
             expected_byte_count += contract_count * 21;
             command_state = Contracts.CMD_STATE_EXPECT_RESPONSE;
@@ -307,6 +309,7 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_HANDLE_CLT_JOIN_SERVER, '
                     game_class = read_ubyte(other.backend_socket);
                     points = read_ubyte(other.backend_socket);
                     owner = global.myself;
+                    owner_id = Contracts.session_token;
                 }
                 ds_map_add(Contracts.contracts_by_uuid, new_contract.contract_id, new_contract);
             }
@@ -339,6 +342,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_REGISTER_SERVE
     Contracts.server_validation_token = read_binstring(backend_socket, 16);
     gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_SERVER_ID_KEY, hex(Contracts.server_id));
     gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_SERVER_VALID_TOKEN_KEY, hex(Contracts.server_validation_token));
+
     
     running_handler_event = noone;
 ');
@@ -410,18 +414,37 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
                 read_binstring(backend_socket, contract_count * 21);
             } else {
                 for (i = 0; i < contract_count; i += 1) {
-                    var newContract;
-                    newContract = instance_create(0, 0, Contracts.Contract);
-                    with (newContract) {
-                        contract_id = read_binstring(other.backend_socket, 16);
-                        contract_type = read_ubyte(other.backend_socket);
-                        value = read_ubyte(other.backend_socket);
-                        target_value = read_ubyte(other.backend_socket);
-                        game_class = read_ubyte(other.backend_socket);
-                        points = read_ubyte(other.backend_socket);
-                        owner = _player;
+                    var contract_id, contract_type, value, target_value, game_class, points;
+                    
+                    contract_id = read_binstring(other.backend_socket, 16);
+                    contract_type = read_ubyte(other.backend_socket);
+                    value = read_ubyte(other.backend_socket);
+                    target_value = read_ubyte(other.backend_socket);
+                    game_class = read_ubyte(other.backend_socket);
+                    points = read_ubyte(other.backend_socket);
+                    
+                    if (ds_map_exists(Contracts.contracts_by_uuid, contract_id)) {
+                        // same player joins again; re-link it, dont create a new one
+                        with (ds_map_find_value(Contracts.contracts_by_uuid, contract_id)) {
+                            owner = _player;
+                        }
+                        // TODO maybe a PluginPacket to sync value_increment
+                    } else {
+                        var newContract;
+                        newContract = instance_create(0, 0, Contracts.Contract);
+                        
+                        newContract.contract_id = contract_id;
+                        newContract.contract_type = contract_type;
+                        newContract.value = value;
+                        newContract.target_value = target_value;
+                        newContract.game_class = game_class;
+                        newContract.points = points;
+                        
+                        newContract.owner = _player;
+                        newContract.owner_id = _player.Contracts_session_token;
+                        
+                        ds_map_add(Contracts.contracts_by_uuid, newContract.contract_id, newContract);
                     }
-                    ds_map_add(Contracts.contracts_by_uuid, newContract.contract_id, newContract);
                 }
             }
             
@@ -441,18 +464,16 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
 
 
 object_event_add(ServerBackendNetworker, ev_other, EVT_SEND_SRV_GAME_DATA, '
-    var _user_contract_list, _contracts_by_user, tmp_map_key, i, val;
+    var _user_contract_list, _contracts_by_user, _user_session_key, i, val;
     _contracts_by_user = ds_map_create();  // contract lists by user session token
-    _user_contract_list = ds_list_create(); // contract list
     
     with (Contracts.Contract) {
-        if (owner != noone) // TODO on Player ev_destroy, set owner to noone, but do not destroy the Contract instance. Contract should be persistent. Contract should have a session_token, not a Player. Maybe both?
         if (value_increment > 0) {
-            if (!ds_map_exists(_contracts_by_user, owner.Contracts_session_token)) {
+            if (!ds_map_exists(_contracts_by_user, owner_id)) {
                 _user_contract_list = ds_list_create();
-                ds_map_add(_contracts_by_user, owner.Contracts_session_token, _user_contract_list);
+                ds_map_add(_contracts_by_user, owner_id, _user_contract_list);
             } else {
-                _user_contract_list = ds_map_find_value(_contracts_by_user, owner.Contracts_session_token);
+                _user_contract_list = ds_map_find_value(_contracts_by_user, owner_id);
             }
             ds_list_add(_user_contract_list, id);
         }
@@ -463,15 +484,15 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_SEND_SRV_GAME_DATA, '
     write_binstring(backend_socket, Contracts.server_validation_token);
     
     // TODO maybe dont save serverid or validation token in ini, because one server desync makes it unusable unless you edit out your serverid
+    // TODO outside of this specific scope, but the whole validation exchange can probably be dumbed down to private key/public key on both clients and servers
     
     write_ubyte(backend_socket, ds_map_size(_contracts_by_user));
     
-    tmp_map_key = ds_map_find_first(_contracts_by_user);
-    while (is_string(tmp_map_key)) {
-        val = ds_list_find_value(_user_contract_list, 0);
-        write_binstring(backend_socket, val.owner.Contracts_session_token);  // TODO ensure Player has a session_token
+    _user_session_key = ds_map_find_first(_contracts_by_user);
+    while (is_string(_user_session_key)) {
+        _user_contract_list = ds_map_find_value(_contracts_by_user, _user_session_key);
         
-        _user_contract_list = ds_map_find_value(_contracts_by_user, tmp_map_key);
+        write_binstring(backend_socket, _user_session_key);
         write_ubyte(backend_socket, ds_list_size(_user_contract_list));
         
         for (i = 0; i < ds_list_size(_user_contract_list); i+=1) {
@@ -483,9 +504,10 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_SEND_SRV_GAME_DATA, '
                 event_perform(ev_other, Contracts.EVT_CONTRACT_ON_DATA_SENT);
             }
         }
+        
         ds_list_destroy(_user_contract_list);
         
-        tmp_map_key = ds_map_find_next(_contracts_by_user, tmp_map_key);
+        _user_session_key = ds_map_find_next(_contracts_by_user, _user_session_key);
     }
     
     ds_map_destroy(_contracts_by_user);
@@ -500,11 +522,14 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
     switch (command_state) {
         case Contracts.CMD_STATE_INIT:
             Contracts.server_validation_token = read_binstring(backend_socket, 16);
-            gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_SERVER_VALID_TOKEN_KEY, hex(Contracts.server_validation_token));
             user_count = read_ubyte(backend_socket);
             
-            expected_byte_count += 16 + 1;
-            command_state = Contracts.CMD_STATE_EXPECT_COMPLETED_CONTRACT_COUNT;
+            if (user_count > 0) {
+                expected_byte_count += 16 + 1;
+                command_state = Contracts.CMD_STATE_EXPECT_COMPLETED_CONTRACT_COUNT;
+            } else {
+                running_handler_event = noone;
+            }
             break;
             
         case Contracts.CMD_STATE_EXPECT_COMPLETED_CONTRACT_COUNT:
@@ -557,6 +582,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
                         game_class = read_ubyte(other.backend_socket);
                         points = read_ubyte(other.backend_socket);
                         owner = other._player;
+                        owner_id = other.received_session_token;
                         
                         write_binstring(other.buffer_for_player, contract_id);
                         write_ubyte(other.buffer_for_player, contract_type);

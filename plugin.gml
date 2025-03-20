@@ -9,6 +9,14 @@ BACKEND_PORT = 4646
 contracts_by_uuid = ds_map_create();
 players_by_session_token = ds_map_create();
 
+user_key = ""
+session_token = ""
+
+joined_server_id = ""
+
+server_id = ""
+server_validation_token = ""
+
 execute_file(directory + "\src\ini.gml");
 execute_file(directory + "\src\Player.gml");
 execute_file(directory + "\src\Contract.gml");

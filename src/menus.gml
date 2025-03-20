@@ -133,7 +133,7 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
     for (contract_index = nbOffset * nbPerPage; contract_index < min(nbMax, (nbOffset+1) * nbPerPage); contract_index += 1) {
         contract_data = ds_list_find_value(contracts_list, contract_index);
         
-        // achievement bg rect
+        // bg rect
         rectX = xoffset + rectXpad;
         rectY = yoffset + rectYpad + rectIndex*(rectH + rectYpad);
         draw_set_color(c_black);
@@ -144,12 +144,18 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
         draw_set_halign(fa_left);
         draw_set_valign(fa_top);
         draw_set_alpha(1);
+        draw_set_color(c_white);
+        if (contract_data.owner != noone) {
+            draw_text(rectX + nameXOffset, rectY + nameYOffset, contract_data.owner.name);
+        } else {
+            draw_text(rectX + nameXOffset, rectY + nameYOffset, hex(contract_data.owner_id));
+        }
         if (contract_data.completed) {
             draw_set_color(c_green);
         } else {
             draw_set_color(c_orange);
         }
-        draw_text(rectX + nameXOffset, rectY + nameYOffset, contract_data.description);
+        draw_text(rectX + descXOffset, rectY + descYOffset, contract_data.description);
         
         // progress
         draw_set_halign(fa_right);
@@ -172,6 +178,10 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
             }
         }
         draw_text(rectX + progressXOffset, rectY + progressYOffset, string(contract_data.value) + "/" + string(contract_data.target_value));
+        if (contract_data.value_increment > 0) {
+            draw_set_color(c_teal);
+            draw_text(rectX + progressXOffset, rectY + descYOffset, "+" + string(contract_data.value_increment));
+        }
         
         // tracking
         if (contract_data.completed) {

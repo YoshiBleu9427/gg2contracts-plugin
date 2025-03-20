@@ -53,8 +53,6 @@ object_event_add(PlayerControl, ev_destroy, 0, '
     }
 ');
 
-// TODO on map end, send data
-
 
 //  On create,
 //      if server, register
@@ -109,11 +107,9 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
         }
     }
     
-    // TODO the better way to do it is, wait until you have the server_id, then
-    // decide if your session_token is good for this server_id, then
     // when youre ready to send your session token, send it
     if (!tried_to_register_client) {
-        if (Contracts.backend_knows_we_joined_as_client) {
+        if (Contracts.session_token != "") {
             var buf;
             buf = buffer_create();
             write_ubyte(buf, Contracts.NET_GAME_CLT_REGISTER_CLIENT);
@@ -133,6 +129,13 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
 //  Handle received plugin packets
 //
 object_event_add(PluginNetworker, ev_step, ev_step_normal, '
+    if (global.isHost) {
+        if (Contracts.server_id = "") {
+            // not ready to handle clients
+            exit;
+        }
+    }
+    
     var buf, _player, respBuf, header;
     var received_uuid;
     var count, i;
@@ -151,8 +154,8 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
             //
             case Contracts.NET_GAME_CLT_HELLO:
                 if (!global.isHost) {
-                    // TODO what to do on error?
                     show_error("Contracts plugin error: client received unexpected NET_GAME_CLT_HELLO", false);
+                    exit;
                 }
                 
                 received_uuid = read_binstring(buf, 16);
@@ -171,8 +174,8 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                 
             case Contracts.NET_GAME_CLT_REGISTER_CLIENT:
                 if (!global.isHost) {
-                    // TODO what to do on error?
                     show_error("Contracts plugin error: client received unexpected NET_GAME_CLT_HELLO", false);
+                    exit;
                 }
                 
                 with (instance_create(0, 0, Contracts.ServerBackendNetworker)) {
@@ -190,14 +193,14 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
             //  Only clients should receive those, but the server can also send those to itself
             //
             case Contracts.NET_GAME_SRV_HELLO:
-                received_uuid = read_binstring(buf, 16);
+                Contracts.joined_server_id = read_binstring(buf, 16);
+                
                 if (global.isHost) {
-                    if (Contracts.server_id != received_uuid) {
+                    if (Contracts.server_id != Contracts.joined_server_id) {
                         // TODO what to do on error?
                         show_error("Contracts plugin error: server sent itself a server_id that is not, in fact, its server_id", false);
+                        exit;
                     }
-                } else {
-                    Contracts.server_id = received_uuid  // TODO use last_joined_server instead
                 }
                 
                 with (instance_create(0,0,Contracts.ClientBackendNetworker)) {
@@ -251,6 +254,7 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                         game_class = read_ubyte(buf);
                         points = read_ubyte(buf);
                         owner = global.myself;
+                        owner_id = Contracts.session_token;
                     }
                     ds_map_add(Contracts.contracts_by_uuid, newContract.contract_id, newContract);
                 }
