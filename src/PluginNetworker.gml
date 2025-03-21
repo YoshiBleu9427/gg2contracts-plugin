@@ -62,16 +62,6 @@ object_event_add(PluginNetworker, ev_create, 0, '
     tried_to_login = false;
     tried_to_register_client = false;
     
-    if (global.isHost) {
-        if ((Contracts.server_id == "") or (Contracts.server_validation_token == "")) {
-            with (instance_create(0, 0, Contracts.ServerBackendNetworker)) {
-                event_perform(ev_other, Contracts.EVT_SEND_HELLO);
-                on_hello_command = Contracts.EVT_SEND_SRV_REGISTER_SERVER;
-                destroy_on_queue_empty = true;  // TODO maybe this isnt even needed, and I can always destroy the networker when queue is empty when not in debug mode
-            }
-        }
-    }
-    
     
     if (Contracts.user_key == "") {
         if (!show_question("Welcome to Contracts!##Play the game. Complete missions. Earn points!#Score a lot and earn prices!##Would you like to sign up?")) { // TODO better signup form
@@ -82,6 +72,16 @@ object_event_add(PluginNetworker, ev_create, 0, '
                 event_perform(ev_other, Contracts.EVT_SEND_HELLO);
                 on_hello_command = Contracts.EVT_SEND_CLT_NEW_ACCOUNT;
                 destroy_on_queue_empty = true;
+            }
+        }
+    }
+    
+    if (global.isHost) {
+        if ((Contracts.server_id == "") or (Contracts.server_validation_token == "")) {
+            with (instance_create(0, 0, Contracts.ServerBackendNetworker)) {
+                event_perform(ev_other, Contracts.EVT_SEND_HELLO);
+                on_hello_command = Contracts.EVT_SEND_SRV_REGISTER_SERVER;
+                destroy_on_queue_empty = true;  // TODO maybe this isnt even needed, and I can always destroy the networker when queue is empty when not in debug mode
             }
         }
     }

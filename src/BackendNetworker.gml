@@ -331,6 +331,8 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_HANDLE_CLT_JOIN_SERVER, '
  */
 object_event_add(ServerBackendNetworker, ev_other, EVT_SEND_SRV_REGISTER_SERVER, '
     write_ubyte(backend_socket, Contracts.NET_BACK_REQ_REGISTER_SERVER);
+    write_ubyte(backend_socket, string_length(global.serverName));
+    write_string(backend_socket, global.serverName);
     socket_send(backend_socket);
     
     expected_byte_count += 2 * 16;
