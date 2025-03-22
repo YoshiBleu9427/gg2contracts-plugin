@@ -228,8 +228,11 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                 
             case Contracts.NET_GAME_SRV_FAIL:
                 // oh no
-                // show popup or something
-                // and disable plugin probably. not that it does anything clientside. so do nothing? maybe just dont respawn a PluginNetworker
+                with (Contracts.errorLog) {
+                    log = "Contracts plugin error: version mismatch between client and server";
+                    event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+                }
+                // TODO disable plugin probably. not that it does anything clientside. so do nothing? maybe just dont respawn a PluginNetworker
                 break;
                 
             case Contracts.NET_GAME_SRV_UPDATE_CONTRACTS:
@@ -242,7 +245,6 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                 for (i = 0; i < count; i += 1) {
                     completed_contract_uuid = read_binstring(buf, 16);
                     if (!ds_map_exists(Contracts.contracts_by_uuid, completed_contract_uuid)) {
-                        // TODO error
                         with (Contracts.errorLog) {
                             log = "Contracts plugin error: completed unknown contract " + string(hex(completed_contract_uuid));
                             event_perform(ev_other, Contracts.EVT_ERROR_LOG);
