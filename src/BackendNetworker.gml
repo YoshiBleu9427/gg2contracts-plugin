@@ -138,14 +138,19 @@ object_event_add(BackendNetworker, ev_step, ev_step_normal, '
             }
         }
         
-        // TODO crash silently in dedicated mode
         if (socket_has_error(backend_socket)) {
-            show_error("Lost connexion to the Contracts server: " + socket_error(backend_socket), false);
+            with (Contracts.errorLog) {
+                log = "Lost connexion to the Contracts server: " + socket_error(other.backend_socket);
+                event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+            }
             instance_destroy();
             break;
         }
         if (current_time - last_contact > 30000) {  // TODO const
-            show_error("Lost connexion to the Contracts server (timeout)", false);
+            with (Contracts.errorLog) {
+                log = "Lost connexion to the Contracts server (timeout)";
+                event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+            }
             instance_destroy();
             break;
         }
@@ -201,11 +206,17 @@ object_event_add(BackendNetworker, ev_other, EVT_HANDLE_HELLO, '
             break;
         case Contracts.NET_BACK_RESP_FAIL:
             // oh no
-            show_error("Failed to get hello from Contracts backend. Version mismatch?", false);  // TODO better handling
+            with (Contracts.errorLog) {
+                log = "Failed to get hello from Contracts backend server. Version mismatch?";
+                event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+            }
             instance_destroy();
             break;
         default:
-            show_error("Unexpected response " + string(resp) + " from Contracts backend (EVT_HANDLE_HELLO)", false);
+            with (Contracts.errorLog) {
+                log = "Unexpected response " + string(resp) + " from Contracts backend (EVT_HANDLE_HELLO)";
+                event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+            }
             instance_destroy();
             break;
         
@@ -243,12 +254,18 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_HANDLE_CLT_LOGIN, '
             
         case Contracts.NET_BACK_RESP_FAIL:
             // oh no
-            show_error("Failed to login to Contracts backend.", false); // TODO better handling
+            with (Contracts.errorLog) {
+                log = "Failed to login to Contracts backend.";
+                event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+            }
             instance_destroy();
             break;
             
         default:
-            show_error("Unexpected response " + string(resp) + " from Contracts backend (EVT_HANDLE_CLT_LOGIN)", false);
+            with (Contracts.errorLog) {
+                log = "Unexpected response " + string(resp) + " from Contracts backend (EVT_HANDLE_CLT_LOGIN)";
+                event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+            }
             instance_destroy();
             break;
         
@@ -279,7 +296,10 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_HANDLE_CLT_NEW_ACCOUNT, '
 
 object_event_add(ClientBackendNetworker, ev_other, EVT_SEND_CLT_JOIN_SERVER, '
     if (string_length(Contracts.joined_server_id) != 16) {
-        show_error("Contracts plugin error: bad length for joined_server_id (EVT_SEND_CLT_JOIN_SERVER)", false);
+        with (Contracts.errorLog) {
+            log = "Contracts plugin error: bad length for joined_server_id (EVT_SEND_CLT_JOIN_SERVER)";
+            event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+        }
     }
     write_ubyte(backend_socket, Contracts.NET_BACK_REQ_JOIN_SERVER);
     write_binstring(backend_socket, Contracts.joined_server_id);
@@ -353,8 +373,10 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_REGISTER_SERVE
 
 object_event_add(ServerBackendNetworker, ev_other, EVT_SEND_SRV_SERVER_RECEIVES_CLIENT, '
     if (received_session_token == "") {
-        // TODO dont show error in dedicated mode
-        show_error("Contracts plugin error: ServerBackendNetworker.received_session_token is undefined", false);
+        with (Contracts.errorLog) {
+            log = "ServerBackendNetworker.received_session_token is undefined";
+            event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+        }
     }
     write_ubyte(backend_socket, Contracts.NET_BACK_REQ_SERVER_RECEIVES_CLIENT);
     write_binstring(backend_socket, Contracts.server_id);
@@ -367,7 +389,10 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_SEND_SRV_SERVER_RECEIVES_
 
 object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVES_CLIENT, '
     if (received_session_token == "") {
-        show_error("Contracts plugin error: ServerBackendNetworker.received_session_token is undefined in Handler, and THAT is super weird", false);
+        with (Contracts.errorLog) {
+            log = "ServerBackendNetworker.received_session_token is undefined in Handler, and THAT is super weird";
+            event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+        }
     }
     
     var resp, _player, pluginPacketBuffer;
@@ -396,7 +421,10 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
                     break;
                     
                 default:
-                    show_error("Unexpected response " + string(resp) + " from Contracts backend (EVT_HANDLE_SRV_SERVER_RECEIVES_CLIENT)", false);
+                    with (Contracts.errorLog) {
+                        log = "Unexpected response " + string(resp) + " from Contracts backend (EVT_HANDLE_SRV_SERVER_RECEIVES_CLIENT)";
+                        event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+                    }
                     instance_destroy();
                     break;
             }

@@ -17,6 +17,7 @@ joined_server_id = ""
 server_id = ""
 server_validation_token = ""
 
+execute_file(directory + "\src\ErrorLog.gml");
 execute_file(directory + "\src\ini.gml");
 execute_file(directory + "\src\Player.gml");
 execute_file(directory + "\src\Contract.gml");

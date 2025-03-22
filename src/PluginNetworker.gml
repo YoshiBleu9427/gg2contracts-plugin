@@ -154,7 +154,10 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
             //
             case Contracts.NET_GAME_CLT_HELLO:
                 if (!global.isHost) {
-                    show_error("Contracts plugin error: client received unexpected NET_GAME_CLT_HELLO", false);
+                    with (Contracts.errorLog) {
+                        log = "Client received unexpected NET_GAME_CLT_HELLO";
+                        event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+                    }
                     exit;
                 }
                 
@@ -174,7 +177,10 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                 
             case Contracts.NET_GAME_CLT_REGISTER_CLIENT:
                 if (!global.isHost) {
-                    show_error("Contracts plugin error: client received unexpected NET_GAME_CLT_HELLO", false);
+                    with (Contracts.errorLog) {
+                        log = "Client received unexpected NET_GAME_CLT_REGISTER_CLIENT";
+                        event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+                    }
                     exit;
                 }
                 
@@ -198,7 +204,10 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                 if (global.isHost) {
                     if (Contracts.server_id != Contracts.joined_server_id) {
                         // TODO what to do on error?
-                        show_error("Contracts plugin error: server sent itself a server_id that is not, in fact, its server_id", false);
+                        with (Contracts.errorLog) {
+                            log = "Contracts plugin error: server sent itself a server_id that is not, in fact, its server_id";
+                            event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+                        }
                         exit;
                     }
                 }
@@ -234,7 +243,10 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                     completed_contract_uuid = read_binstring(buf, 16);
                     if (!ds_map_exists(Contracts.contracts_by_uuid, completed_contract_uuid)) {
                         // TODO error
-                        show_error("Contracts plugin error: completed unknown contract " + string(hex(completed_contract_uuid)), false)
+                        with (Contracts.errorLog) {
+                            log = "Contracts plugin error: completed unknown contract " + string(hex(completed_contract_uuid));
+                            event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+                        }
                     } else {                    
                         completed_contract = ds_map_find_value(Contracts.contracts_by_uuid, completed_contract_uuid);
                         completed_contract.completed = true;
@@ -261,8 +273,10 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                 break;
                 
             default:
-                // TODO error
-                show_error("Contracts: received unknown header in PluginNetworker: " + string(header), false);
+                with (Contracts.errorLog) {
+                    log = "Contracts: received unknown header in PluginNetworker: " + string(header);
+                    event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+                }
                 break
         }
     
