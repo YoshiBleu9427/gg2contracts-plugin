@@ -524,6 +524,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
     switch (command_state) {
         case Contracts.CMD_STATE_INIT:
             Contracts.server_validation_token = read_binstring(backend_socket, 16);
+            gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_SERVER_VALID_TOKEN_KEY, hex(Contracts.server_validation_token));
             user_count = read_ubyte(backend_socket);
             
             if (user_count > 0) {

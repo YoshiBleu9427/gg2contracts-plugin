@@ -84,7 +84,7 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
             value_increment = owner.stats[KILLS];
             break;
         case Contracts.CONTRACT_TYPE_HEALING:
-            value_increment = owner.stats[HEALING];
+            value_increment = ceil(owner.stats[HEALING] / 100);
             break;
         case Contracts.CONTRACT_TYPE_UBERS:
             value_increment = owner.stats[INVULNS];
@@ -100,6 +100,7 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
     }
 ');
 
+// TODO run this event on data sent AND backend replies positively
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_DATA_SENT, '
     // if player left, no point in keeping the contract
     // now that the update was sent to the backend, it is safe to delete here

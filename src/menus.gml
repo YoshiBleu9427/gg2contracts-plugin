@@ -175,6 +175,13 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
                     c_black, c_gray, c_white,
                     0, 1, 0
                 )
+                draw_healthbar(
+                    rectX + progressXOffset + 8 , rectY + progressYOffset + 1,
+                    rectX + progressXOffset + 32, rectY + progressYOffset + 7,
+                    min(100, 100 * (contract_data.value + contract_data.value_increment)/contract_data.target_value),
+                    c_black, c_gray, c_teal,
+                    0, 1, 0
+                )
             }
         }
         draw_text(rectX + progressXOffset, rectY + progressYOffset, string(contract_data.value) + "/" + string(contract_data.target_value));

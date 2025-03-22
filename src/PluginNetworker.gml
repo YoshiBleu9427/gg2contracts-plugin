@@ -232,11 +232,11 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                 count = read_ubyte(buf);
                 for (i = 0; i < count; i += 1) {
                     completed_contract_uuid = read_binstring(buf, 16);
-                    if (!ds_map_exists(contracts_by_uuid, completed_contract_uuid)) {
+                    if (!ds_map_exists(Contracts.contracts_by_uuid, completed_contract_uuid)) {
                         // TODO error
                         show_error("Contracts plugin error: completed unknown contract " + string(hex(completed_contract_uuid)), false)
                     } else {                    
-                        completed_contract = ds_map_find_value(contracts_by_uuid, completed_contract_uuid);
+                        completed_contract = ds_map_find_value(Contracts.contracts_by_uuid, completed_contract_uuid);
                         completed_contract.completed = true;
                         // TODO do a little song-and-dance notification thing
                     }
