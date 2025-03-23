@@ -114,7 +114,7 @@ object_event_add(ServerBackendNetworker, ev_create, 0, '
 ');
 
 object_event_add(ClientBackendNetworker, ev_create, 0, '
-    event_inherited();    
+    event_inherited();
     on_login_command = noone;
 ');
 
@@ -435,6 +435,10 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
             break;
             
         case Contracts.CMD_STATE_EXPECT_RESPONSE:
+        
+            pluginPacketBuffer = buffer_create();
+            write_ubyte(pluginPacketBuffer, Contracts.NET_GAME_SRV_SUCCESS);
+            
             if ((global.isHost) and (_player == global.myself)) {
                 // as the host, we already know our own contracts,
                 // because we received them after sending NET_BACK_REQ_JOIN_SERVER
@@ -453,10 +457,19 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
                     
                     if (ds_map_exists(Contracts.contracts_by_uuid, contract_id)) {
                         // same player joins again; re-link it, dont create a new one
-                        with (ds_map_find_value(Contracts.contracts_by_uuid, contract_id)) {
+                        var found_contract;
+                        found_contract = ds_map_find_value(Contracts.contracts_by_uuid, contract_id);
+                        with (found_contract) {
                             owner = _player;
                         }
-                        // TODO maybe a PluginPacket to sync value_increment
+                        
+                        // also sync value_increment
+                        if (!found_contract.completed)
+                        if (found_contract.value_increment > 0) {
+                            write_ubyte(pluginPacketBuffer, Contracts.NET_GAME_SRV_SYNC_INCREMENT);
+                            write_binstring(pluginPacketBuffer, contract_id);
+                            write_ubyte(pluginPacketBuffer, found_contract.value_increment);   
+                        }
                     } else {
                         var newContract;
                         newContract = instance_create(0, 0, Contracts.Contract);
@@ -478,11 +491,9 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
             
             if (_player != -1) {
                 // tell the player it worked
-                pluginPacketBuffer = buffer_create();
-                write_ubyte(pluginPacketBuffer, Contracts.NET_GAME_SRV_SUCCESS);
                 PluginPacketSendTo(Contracts.packetID, pluginPacketBuffer, _player);
-                buffer_destroy(pluginPacketBuffer);
             }
+            buffer_destroy(pluginPacketBuffer);
             
             running_handler_event = noone;
             break;
@@ -579,6 +590,8 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
                 contract = ds_map_find_value(Contracts.contracts_by_uuid, contract_uuid)
                 if (contract != -1) {
                     contract.completed = true;
+                } else {
+                    // this can happen for contracts of a player who left
                     // TODO handle error maybe?
                 }
                 write_binstring(buffer_for_player, contract_uuid);
@@ -601,7 +614,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
                 // player left before getting response from backend, ignore this data specifically
                 read_binstring(backend_socket, 20 * contract_count);
             } else {
-                for (i = 0; i < contract_count; i += 1) { 
+                for (i = 0; i < contract_count; i += 1) {
                     var newContract;
                     newContract = instance_create(0, 0, Contracts.Contract);
                     with (newContract) {
@@ -621,7 +634,6 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
                     }
                     ds_map_add(Contracts.contracts_by_uuid, newContract.contract_id, newContract);
                 }
-                
                 PluginPacketSendTo(Contracts.packetID, buffer_for_player, _player);
                 buffer_destroy(buffer_for_player);
             }

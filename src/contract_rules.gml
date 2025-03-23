@@ -4,6 +4,7 @@
 
 object_event_add(Character, ev_destroy, 0, '
     if (global.isHost)
+    if (global.winners == -1)
 	if (lastDamageDealer != player)
     {
         with (Contracts.Contract) {

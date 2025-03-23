@@ -16,18 +16,18 @@ object_event_add(ErrorLog, ev_destroy, 0, '
 ');
 
 object_event_add(ErrorLog, ev_other, EVT_ERROR_LOG, '
+    ds_list_add(logs, log);
+    
     if (global.isHost) {
         if (!instance_exists(NoticeO)) {
             with (instance_create(0, 0, NoticeO)) {
-                notice = NOTICE_CUSTOM;  // TODO introduce new notice type if possible
+                notice = NOTICE_CUSTOM;
                 message = "[CONTRACTS ERROR] " + other.log;
             }
         }
     } else {
         show_error("[CONTRACTS ERROR] " + log, false);
     }
-    
-    ds_list_add(logs, log);
 ');
 
 object_event_add(ErrorLog, ev_step, ev_step_begin, '

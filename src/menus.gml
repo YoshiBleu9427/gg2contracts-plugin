@@ -19,6 +19,25 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
         ");
     }
     
+    menu_addlink("Clear completed contracts", "
+        with (Contracts.Contract) {
+            if (completed) {
+                instance_destroy();
+            }
+        }
+        
+        ds_list_clear(contracts_list);
+        var map_key, map_value;
+        map_key = ds_map_find_first(Contracts.contracts_by_uuid);
+        while (is_string(map_key)) {
+            map_value = ds_map_find_value(Contracts.contracts_by_uuid, map_key);
+            if (map_value.owner == global.myself) {
+                ds_list_add(contracts_list, map_value);
+            }
+            map_key = ds_map_find_next(Contracts.contracts_by_uuid, map_key);
+        }
+    ");
+    
     menu_addback("<<< Back", "
         instance_destroy();
         instance_create(0,0,InGameMenuController);
