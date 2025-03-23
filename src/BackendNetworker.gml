@@ -333,8 +333,6 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_HANDLE_CLT_JOIN_SERVER, '
                 }
                 ds_map_add(Contracts.contracts_by_uuid, new_contract.contract_id, new_contract);
             }
-            Contracts.backend_knows_we_joined_as_client = true;  // TODO global var bad
-            // use the newly received session_token instead
             running_handler_event = noone;
             break;
     }
