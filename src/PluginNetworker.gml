@@ -81,6 +81,16 @@ object_event_add(PluginNetworker, ev_create, 0, '
             }
         }
     }
+    
+    // Are you a client returning after downloading a map?
+    // re-sync your own known contracts
+    if (Contracts.session_token != "") {
+        with (Contracts.Contract) {
+            if (owner_id == Contracts.session_token) {
+                owner = global.myself;
+            }
+        }
+    }
 ');
 
 
@@ -139,7 +149,6 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
     var contract_id, contract_type, value, target_value, value_increment, game_class, points;
     
     while (PluginPacketGetBuffer(Contracts.packetID) != -1) {
-        respBuf = buffer_create();
         buf = PluginPacketGetBuffer(Contracts.packetID);
         _player = PluginPacketGetPlayer(Contracts.packetID);
         
@@ -159,6 +168,7 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                         exit;
                     }
                     
+                    respBuf = buffer_create();
                     received_uuid = read_binstring(buf, 16);
                     if (received_uuid != Contracts.NET_GAME_HELLO_UUID) {
                         // invalid client
@@ -182,15 +192,25 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                         exit;
                     }
                     
-                    with (instance_create(0, 0, Contracts.ServerBackendNetworker)) {
-                        event_perform(ev_other, Contracts.EVT_SEND_HELLO); // TODO creating it always starts with hello; remove everywhere
-                        received_session_token = read_binstring(buf, 16);  // TODO test what happens if client sends bad size
-                        _player.Contracts_session_token = received_session_token;
-                        ds_map_add(Contracts.players_by_session_token, received_session_token, _player);
-                        on_hello_command = Contracts.EVT_SEND_SRV_SERVER_RECEIVES_CLIENT;
-                        destroy_on_queue_empty = true;
+                    received_uuid = read_binstring(buf, 16);
+                    if (ds_map_exists(Contracts.players_by_session_token, received_uuid)) {
+                        // this is a client returning after downloading a map
+                        // (or a player trying to use two clients at the same time; they wont gain anything from doing that, so ignore that train of thought)
+                        respBuf = buffer_create();
+                        write_ubyte(respBuf, Contracts.NET_GAME_SRV_SUCCESS);
+                        PluginPacketSendTo(Contracts.packetID, respBuf, _player);
+                        buffer_destroy(respBuf);
+                    } else {
+                        with (instance_create(0, 0, Contracts.ServerBackendNetworker)) {
+                            event_perform(ev_other, Contracts.EVT_SEND_HELLO); // TODO creating it always starts with hello; remove everywhere
+                            received_session_token = received_uuid;  // TODO test what happens if client sends bad size
+                            _player.Contracts_session_token = received_session_token;
+                            ds_map_add(Contracts.players_by_session_token, received_session_token, _player);
+                            on_hello_command = Contracts.EVT_SEND_SRV_SERVER_RECEIVES_CLIENT;
+                            destroy_on_queue_empty = true;
+                        }
+                        // will have to wait for backend response before getting back to _player
                     }
-                    // will have to wait for backend response before getting back to _player
                     break;
                     
                 // ------------
