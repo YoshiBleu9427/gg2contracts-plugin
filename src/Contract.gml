@@ -14,7 +14,7 @@ EVT_CONTRACT_ON_MAP_END = ev_user1;
 EVT_CONTRACT_ON_DATA_SENT = ev_user2;
 EVT_CONTRACT_ON_INCREMENTED = ev_user3;
 EVT_CONTRACT_ON_COMPLETED = ev_user4;
-
+EVT_CONTRACT_ON_RESTORED = ev_user5;
 
 
 
@@ -34,6 +34,15 @@ var i;
 for (i = 0; i < 256; i+=1) {
     CONTRACT_DESCRIPTION_BY_TYPE[i] = "<undefined>"
 }
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS]           = "Kills"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS_ON_CLASS]  = "Kill {class}"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS_AS_CLASS]  = "Kills as {class}"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_HEALING]         = "Healing"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERS]           = "Superburts"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_ROUNDS_PLAYED]   = "Rounds played"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_ROUNDS_WON]      = "Rounds won"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_DEBUG]           = "DEBUG"
+
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS]           = "Get {value} kills"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS_ON_CLASS]  = "Get {value} kills against {class}"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS_AS_CLASS]  = "Get {value} kills while playing as {class}"
@@ -58,6 +67,7 @@ object_event_add(Contract, ev_create, 0, '
     owner = noone;
     owner_id = "";
     
+    title = "";
     description = "";
     
     value_increment = 0; // how much the contract value changed since receiving it
@@ -68,7 +78,10 @@ object_event_add(Contract, ev_destroy, 0, '
 ');
 
 object_event_add(Contract, ev_step, ev_step_normal, '
-    // update description
+    // update title and description
+    title = Contracts.CONTRACT_TITLE_BY_TYPE[contract_type];
+    title = string_replace(description, "{class}", classname(game_class));
+    
     description = Contracts.CONTRACT_DESCRIPTION_BY_TYPE[contract_type];
     description = string_replace(description, "{value}", string(target_value));
     description = string_replace(description, "{class}", classname(game_class));
@@ -152,19 +165,27 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
     }
 ');
 
+object_event_add(Contract, ev_other, EVT_CONTRACT_ON_RESTORED, '
+    with (Contracts.notification) {
+        message = other.title + ": +" + string(other.value_increment);
+        sound = Contracts.snd_beep;
+        event_perform(ev_other, Contracts.EVT_NOTIFY);
+    }
+');
+
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_INCREMENTED, '
-    // TODO notification? shiny display?
-    with (instance_create(0, 0, NoticeO)) {
-        notice = NOTICE_CUSTOM
-        message = "Synced contract"
+    with (Contracts.notification) {
+        message = other.title + ": +" + string(other.value_increment);
+        sound = Contracts.snd_increase;
+        event_perform(ev_other, Contracts.EVT_NOTIFY);
     }
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_COMPLETED, '
-    // TODO notification? shiny display?
-    with (instance_create(0, 0, NoticeO)) {
-        notice = NOTICE_CUSTOM
-        message = "Completed contract!"
+    with (Contracts.notification) {
+        message = "Completed contract! " + other.description;
+        sound = Contracts.snd_success;
+        event_perform(ev_other, Contracts.EVT_NOTIFY);
     }
 ');
 
@@ -184,5 +205,3 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_DATA_SENT, '
     // reset
     value_increment = 0;
 ');
-
-// TODO event that syncs the value increment from server to client during a round

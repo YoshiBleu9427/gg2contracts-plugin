@@ -6,6 +6,15 @@ Contracts = id;
 BACKEND_HOST = "localhost"
 BACKEND_PORT = 4646
 
+
+snd_beep        = sound_add(directory + "\sounds\beep.mp3", 0, true);
+snd_fadeout     = sound_add(directory + "\sounds\fadeout.mp3", 0, true);
+snd_increase    = sound_add(directory + "\sounds\increase.mp3", 0, true);
+snd_success     = sound_add(directory + "\sounds\success.mp3", 0, true);
+
+img_notification_icon = sprite_add(directory + "\images\notification_icon.png", 1, true, false, 0, 0);
+
+
 contracts_by_uuid = ds_map_create();
 players_by_session_token = ds_map_create();
 
@@ -17,6 +26,7 @@ joined_server_id = ""
 server_id = ""
 server_validation_token = ""
 
+
 execute_file(directory + "\src\ErrorLog.gml");
 execute_file(directory + "\src\ini.gml");
 execute_file(directory + "\src\Player.gml");
@@ -26,3 +36,4 @@ execute_file(directory + "\src\PluginNetworker.gml");
 execute_file(directory + "\src\RoundEndObserver.gml");
 execute_file(directory + "\src\contract_rules.gml");
 execute_file(directory + "\src\menus.gml");
+execute_file(directory + "\src\Notification.gml");
