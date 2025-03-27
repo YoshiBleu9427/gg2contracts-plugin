@@ -91,7 +91,7 @@ notification = instance_create(0, 0, Notification);
 with(notification) {
     message = "";
     display_time = 0;
-    max_display_time = 90;
+    max_display_time = 120;
     sound = noone;
     displayed_messages = ds_list_create();
 }

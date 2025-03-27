@@ -28,28 +28,67 @@ CONTRACT_TYPE_HEALING = 4
 CONTRACT_TYPE_UBERS = 5
 CONTRACT_TYPE_ROUNDS_PLAYED = 6
 CONTRACT_TYPE_ROUNDS_WON = 7
+CONTRACT_TYPE_DOMINATIONS = 8
+CONTRACT_TYPE_CAPTURES = 9
+CONTRACT_TYPE_STABS = 10
+CONTRACT_TYPE_BURN_DURATION = 11
+CONTRACT_TYPE_AUTOGUN_KILLS = 12
+CONTRACT_TYPE_UBERED_KILLS = 13
+CONTRACT_TYPE_DAMAGE_TAKEN = 14
+CONTRACT_TYPE_KILL_STREAK = 15
+CONTRACT_TYPE_HEAL_STREAK = 16
+CONTRACT_TYPE_AUTOGUN_STREAK = 17
+CONTRACT_TYPE_FLARE_KILLS = 18
+CONTRACT_TYPE_GUN_KILLS = 19
+CONTRACT_TYPE_UBERED_STREAK = 20
 CONTRACT_TYPE_DEBUG = 69
 
 var i;
 for (i = 0; i < 256; i+=1) {
     CONTRACT_DESCRIPTION_BY_TYPE[i] = "<undefined>"
 }
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS]           = "Kills"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS_ON_CLASS]  = "Kill {class}"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS_AS_CLASS]  = "Kills as {class}"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_HEALING]         = "Healing"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERS]           = "Superburts"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_ROUNDS_PLAYED]   = "Rounds played"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_ROUNDS_WON]      = "Rounds won"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_DEBUG]           = "DEBUG"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS]             = "Kills"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS_ON_CLASS]    = "Kill {class}"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILLS_AS_CLASS]    = "Kills as {class}"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_HEALING]           = "Healing"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERS]             = "Superburts"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_ROUNDS_PLAYED]     = "Rounds played"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_ROUNDS_WON]        = "Rounds won"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_DOMINATIONS]       = "Dominations"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_CAPTURES]          = "Captures"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_STABS]             = "Stabs"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_BURN_DURATION]     = "Burn duration"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_AUTOGUN_KILLS]     = "Autogun kills"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERED_KILLS]      = "Kills while invicible"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_DAMAGE_TAKEN]      = "Tank damage"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILL_STREAK]       = "Kill streak"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_HEAL_STREAK]       = "Heals in one life"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_AUTOGUN_STREAK]    = "Single Autogun kills"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_FLARE_KILLS]       = "Flare kills"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_GUN_KILLS]         = "Gun kills"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERED_STREAK]     = "Kill streak while invicible"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_DEBUG]             = "DEBUG"
 
-CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS]           = "Get {value} kills"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS]           = "Kill {value} enemies"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS_ON_CLASS]  = "Get {value} kills against {class}"
-CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS_AS_CLASS]  = "Get {value} kills while playing as {class}"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS_AS_CLASS]  = "Kill {value} enemies while playing as {class}"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_HEALING]         = "Heal {value}00 HP"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_UBERS]           = "As healer, activate {value} superbursts"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_ROUNDS_PLAYED]   = "Play {value} rounds"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_ROUNDS_WON]      = "Win {value} rounds"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_DOMINATIONS]     = "Dominate {value} enemies"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_CAPTURES]        = "Capture {value} objectives"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_STABS]           = "As Infiltrator, kill {value} enemies with stabs"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_BURN_DURATION]   = "Burn enemies for {value}0 seconds"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_AUTOGUN_KILLS]   = "Kill {value} enemies with your autogun"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_UBERED_KILLS]    = "Get {value} kills or assists while invicible"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_DAMAGE_TAKEN]    = "Survive {value}00 damage in one life"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILL_STREAK]     = "Kill {value} enemies in one life"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_HEAL_STREAK]     = "Heal {value}00 HP in one life"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_AUTOGUN_STREAK]  = "Kill {value} enemies with the same Autogun"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_FLARE_KILLS]     = "Kill {value} enemies with flares"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_GUN_KILLS]       = "Kill {value} enemies with your primary gun"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_UBERED_STREAK]   = "Get {value} kills or assists in a single invincibility"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_DEBUG]           = "DEBUG"
 
 
@@ -111,11 +150,9 @@ object_event_add(Contract, ev_step, ev_step_normal, '
     var old_increment;
     old_increment = value_increment;
     
+    // TODO move
     // consolidate stats
     switch (contract_type) {
-        case Contracts.CONTRACT_TYPE_KILLS:
-            value_increment = owner.stats[KILLS];
-            break;
         case Contracts.CONTRACT_TYPE_HEALING:
             value_increment = ceil(owner.stats[HEALING] / 100);
             break;
@@ -124,14 +161,14 @@ object_event_add(Contract, ev_step, ev_step_normal, '
             break;
     }
     
-    if (value_increment != old_increment) {
+    if (floor(value_increment) != floor(old_increment)) {
         if (owner != noone) {
             if (owner != global.myself) {
                 var buf;
                 buf = buffer_create();
                 write_ubyte(buf, Contracts.NET_GAME_SRV_SYNC_INCREMENT);
                 write_binstring(buf, contract_id);
-                write_ubyte(buf, value_increment);
+                write_ubyte(buf, floor(value_increment));
                 PluginPacketSendTo(Contracts.packetID, buf, owner);
                 buffer_destroy(buf);
             } else {
@@ -163,6 +200,8 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
             }
             break;
     }
+    
+    value_increment = floor(value_increment);
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_RESTORED, '
