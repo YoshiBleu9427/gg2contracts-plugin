@@ -146,10 +146,10 @@ object_event_add(Contract, ev_step, ev_step_end, '
             break;
         case Contracts.CONTRACT_TYPE_BURN_DURATION:
             if (burn_duration >= 10) {
-                var mod;
-                mod = floor(burn_duration / 10);
-                value_increment += mod;
-                burn_duration -= mod * 10;
+                var modifier;
+                modifier = floor(burn_duration / 10);
+                value_increment += modifier;
+                burn_duration -= modifier * 10;
             }
             break;
     }
@@ -161,7 +161,7 @@ global.dealDamageFunction += '
     if (global.isHost) {
         // CONTRACT_TYPE_DAMAGE_TAKEN
         with (argument1) {
-            if (variable_local_exists("contracts__damage_taken"){
+            if (variable_local_exists("contracts__damage_taken")) {
                 contracts__damage_taken += argument2;
             }
         }

@@ -110,6 +110,7 @@ object_event_add(Contract, ev_create, 0, '
     description = "";
     
     value_increment = 0; // how much the contract value changed since receiving it
+    old_increment = 0;
 ');
 
 object_event_add(Contract, ev_destroy, 0, '
@@ -147,9 +148,6 @@ object_event_add(Contract, ev_step, ev_step_normal, '
     // and set value_increment = preserved_increment + <stat>
     // Also, Contracts probably shouldnt be objects. I cant imagine its good for performance
     
-    var old_increment;
-    old_increment = value_increment;
-    
     // TODO move
     // consolidate stats
     switch (contract_type) {
@@ -176,6 +174,7 @@ object_event_add(Contract, ev_step, ev_step_normal, '
             }
         }
     }
+    old_increment = value_increment;
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '

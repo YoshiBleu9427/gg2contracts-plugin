@@ -75,6 +75,7 @@ object_event_add(Notification, ev_other, EVT_NOTIFY, '
     display_time = max_display_time;
     ds_list_add(displayed_messages, message);
     
+    // TODO disable if F12
     if (!notified_this_frame)
     if (Contracts.play_sounds)
     if (sound != -1)
