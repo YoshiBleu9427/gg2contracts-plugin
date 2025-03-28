@@ -1,5 +1,6 @@
 Notification = object_add();
 object_set_persistent(Notification, true);
+object_set_depth(Notification, -12000);
 
 EVT_NOTIFY = ev_user0;
 

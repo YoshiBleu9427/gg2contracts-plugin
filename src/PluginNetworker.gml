@@ -290,7 +290,6 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                         } else {                    
                             completed_contract = ds_map_find_value(Contracts.contracts_by_uuid, completed_contract_uuid);
                             completed_contract.completed = true;
-                            completed_contract.value = completed_contract.target_value;  // TODO do it elsewhere?
                             with (completed_contract) {
                                 event_perform(ev_other, Contracts.EVT_CONTRACT_ON_COMPLETED);
                             }

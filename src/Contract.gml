@@ -160,29 +160,31 @@ object_event_add(Contract, ev_step, ev_step_normal, '
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
-    // round stats stuff
-    if (!global.isHost) {
-        exit;
-    }
-    
-    // consolidate stats
-    switch (contract_type) {
-        case Contracts.CONTRACT_TYPE_DEBUG:
-            value_increment = 1;
-            break;
-        case Contracts.CONTRACT_TYPE_ROUNDS_PLAYED:
-            value_increment = 1;
-            break;
-        case Contracts.CONTRACT_TYPE_ROUNDS_WON:
-            if (owner != noone) {
-                if (global.winners == owner.team) {
-                    value_increment = 1
+    if (global.isHost) {
+        // consolidate stats
+        switch (contract_type) {
+            case Contracts.CONTRACT_TYPE_DEBUG:
+                value_increment = 1;
+                break;
+            case Contracts.CONTRACT_TYPE_ROUNDS_PLAYED:
+                value_increment = 1;
+                break;
+            case Contracts.CONTRACT_TYPE_ROUNDS_WON:
+                if (owner != noone) {
+                    if (global.winners == owner.team) {
+                        value_increment = 1
+                    }
                 }
-            }
-            break;
+                break;
+        }
+        
+        value_increment = floor(value_increment);
+    } else {
+        // as client, the server will never udpate ongoing contracts
+        // so assume increment will apply
+        value += value_increment;
+        value_increment = 0;
     }
-    
-    value_increment = floor(value_increment);
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_RESTORED, '
@@ -194,14 +196,18 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_RESTORED, '
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_INCREMENTED, '
-    with (Contracts.notification) {
-        message = other.title + ": +" + string(other.value_increment);
-        sound = Contracts.snd_increase;
-        event_perform(ev_other, Contracts.EVT_NOTIFY);
+    if (value_increment > 0) {
+        with (Contracts.notification) {
+            message = other.title + ": +" + string(other.value_increment);
+            sound = Contracts.snd_increase;
+            event_perform(ev_other, Contracts.EVT_NOTIFY);
+        }
     }
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_COMPLETED, '
+    value_increment = 0;
+    value = target_value;
     with (Contracts.notification) {
         message = "Completed contract! " + other.description;
         sound = Contracts.snd_success;
