@@ -1,6 +1,7 @@
 /**
  *  Hooks for more complex contract rules
  */
+
 object_event_add(Character, ev_create, 0, '
     contracts__damage_taken = 0;
 ');
@@ -93,6 +94,7 @@ object_event_add(Character, ev_destroy, 0, '
 	}
 ');
 
+
 object_event_add(Sentry, ev_destroy, 0, '
     if (global.isHost)
     if (global.winners == -1)
@@ -113,19 +115,44 @@ object_event_add(Sentry, ev_destroy, 0, '
 	}
 ');
 
+
 object_event_add(Contract, ev_create, 0, '
+    prev_healing = 0;
+    prev_ubers = 0;
+    prev_caps = 0;
     prev_dom_count = 0;
     burn_duration = 0;
 ');
 with (Contract) {
+    prev_healing = 0;
+    prev_ubers = 0;
+    prev_caps = 0;
     prev_dom_count = 0;
     burn_duration = 0;
 }
+
 object_event_add(Contract, ev_step, ev_step_end, '
     if (!global.isHost) exit;
     if (owner == noone) exit;
     
     switch (contract_type) {
+        case Contracts.CONTRACT_TYPE_HEALING:
+            var heal_diff, modifier;
+            heal_diff = owner.stats[HEALING] - prev_healing;
+            if (heal_diff >= 100) {
+                modifier = floor(heal_diff / 100);
+                value_increment += modifier;
+                prev_healing += modifier * 100;
+            }
+            break;
+            
+        case Contracts.CONTRACT_TYPE_UBERS:
+            if (owner.stats[INVULNS] > prev_ubers) {
+                value_increment += owner.stats[INVULNS] - prev_ubers;
+            }
+            prev_ubers = owner.stats[INVULNS];
+            break;
+            
         case Contracts.CONTRACT_TYPE_DOMINATIONS:
             var dom_count;
             dom_count = domination_kills_getDomCount(owner);
@@ -134,9 +161,14 @@ object_event_add(Contract, ev_step, ev_step_end, '
             }
             prev_dom_count = dom_count;
             break;
+            
         case Contracts.CONTRACT_TYPE_CAPTURES:
-            // TODO
+            if (owner.stats[CAPS] > prev_caps) {
+                value_increment += owner.stats[CAPS] - prev_caps;
+            }
+            prev_caps = owner.stats[CAPS];
             break;
+            
         case Contracts.CONTRACT_TYPE_DAMAGE_TAKEN:
             if (owner.object != -1) {
                 value_increment = floor(owner.object.contracts__damage_taken / 100);
@@ -144,6 +176,7 @@ object_event_add(Contract, ev_step, ev_step_end, '
                 value_increment = 0;
             }
             break;
+            
         case Contracts.CONTRACT_TYPE_BURN_DURATION:
             if (burn_duration >= 10) {
                 var modifier;
@@ -153,8 +186,8 @@ object_event_add(Contract, ev_step, ev_step_end, '
             }
             break;
     }
-    
 ');
+
 
 // dealDamage( sourcePlayer, damagedObject, damageDealt )
 global.dealDamageFunction += '
@@ -173,7 +206,7 @@ global.dealDamageFunction += '
                     if (owner == argument0) {
                         switch (contract_type) {
                             case Contracts.CONTRACT_TYPE_BURN_DURATION:
-                                burn_duration += global.delta_factor;
+                                burn_duration += global.delta_factor / 30;
                                 break;
                         }
                     }

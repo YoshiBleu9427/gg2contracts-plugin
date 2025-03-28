@@ -40,17 +40,17 @@ object_event_add(Notification, ev_draw, 0, '
     var xoffset, yoffset, w, h;
     var alphaMod;
     
-    w = 240;
+    w = 360;
     h = 48;
     
     // TODO configurable position
-    xoffset = view_xview[0] + view_wview[0] - w - 16;
-    yoffset = view_yview[0] + view_hview[0] - h - 64;
+    xoffset = view_xview[0] + 16;
+    yoffset = view_yview[0] + 16;
     
     alphaMod = min(1, min(display_time / 10, max_display_time - (display_time/10)));
     
     draw_set_color(c_black);
-    draw_set_alpha(0.8 * alphaMod);
+    draw_set_alpha(0.6 * alphaMod);
     draw_rectangle(xoffset, yoffset, xoffset + w, yoffset + h, false);
     
     draw_sprite_ext(
@@ -63,8 +63,12 @@ object_event_add(Notification, ev_draw, 0, '
     draw_set_valign(fa_top);
     draw_set_alpha(1 * alphaMod);
     draw_set_color(c_white);
+    
+    var i, displayed_message, text_w_ratio;
     for (i = 0; i < ds_list_size(displayed_messages); i+=1) {
-        draw_text(xoffset + 48, yoffset + 12 * i, message);
+        displayed_message = ds_list_find_value(displayed_messages, i);
+        text_w_ratio = min(1, w / string_width(displayed_message));
+        draw_text_transformed(xoffset + 48, yoffset + 12 * i, displayed_message, text_w_ratio, 1, 0);
     }
 ');
 
@@ -74,6 +78,10 @@ object_event_add(Notification, ev_other, EVT_NOTIFY, '
     
     display_time = max_display_time;
     ds_list_add(displayed_messages, message);
+    
+    if (ds_list_size(displayed_messages) > 4) {
+        ds_list_delete(displayed_messages, 0);
+    }
     
     // TODO disable if F12
     if (!notified_this_frame)

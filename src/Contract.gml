@@ -141,24 +141,6 @@ object_event_add(Contract, ev_step, ev_step_normal, '
         exit;
     }
     
-    // TODO stats-based things desync when client disconnects and reconnects,
-    // because stats are then reset to 0.
-    // Keep a preserved_increment for the server to keep track of,
-    // on player destroy: contract.preserved_increment = value_increment,
-    // and set value_increment = preserved_increment + <stat>
-    // Also, Contracts probably shouldnt be objects. I cant imagine its good for performance
-    
-    // TODO move
-    // consolidate stats
-    switch (contract_type) {
-        case Contracts.CONTRACT_TYPE_HEALING:
-            value_increment = ceil(owner.stats[HEALING] / 100);
-            break;
-        case Contracts.CONTRACT_TYPE_UBERS:
-            value_increment = owner.stats[INVULNS];
-            break;
-    }
-    
     if (floor(value_increment) != floor(old_increment)) {
         if (owner != noone) {
             if (owner != global.myself) {
