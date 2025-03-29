@@ -6,6 +6,9 @@ Contracts = id;
 BACKEND_HOST = "localhost"
 BACKEND_PORT = 4646
 
+WEBSITE_HOST = BACKEND_HOST
+WEBSITE_PORT = 51062
+
 
 snd_beep        = sound_add(directory + "\sounds\beep.mp3", 0, true);
 snd_fadeout     = sound_add(directory + "\sounds\fadeout.mp3", 0, true);

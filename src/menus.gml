@@ -2,24 +2,11 @@ ViewContractsMenu = object_add();
 object_set_parent(ViewContractsMenu, OptionsController);
 object_set_depth(ViewContractsMenu, -130000); 
 object_event_add(ViewContractsMenu, ev_create, 0,'
-    menu_create(60, 320, 98, 1, 32, 0, 96, 96 + 8);
+    menu_create(60, 320, 128, 1, 32, 0, 96, 96 + 8);
     menu_setdimmed();
     menu_background(96, 24, 8, 12, 4);
     
-    if (global.isHost) {
-        menu_addlink("View all", "
-            ds_list_clear(contracts_list);
-            var map_key, map_value;
-            map_key = ds_map_find_first(Contracts.contracts_by_uuid);
-            while (is_string(map_key)) {
-                map_value = ds_map_find_value(Contracts.contracts_by_uuid, map_key);
-                ds_list_add(contracts_list, map_value);
-                map_key = ds_map_find_next(Contracts.contracts_by_uuid, map_key);
-            }
-        ");
-    }
-    
-    menu_addlink("Clear completed contracts", "
+    menu_addlink("Clear completed", "
         with (Contracts.Contract) {
             if (completed) {
                 instance_destroy();
@@ -37,6 +24,13 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
             map_key = ds_map_find_next(Contracts.contracts_by_uuid, map_key);
         }
     ");
+    
+    if (Contracts.user_key != "") {
+        url = "http://" + Contracts.WEBSITE_HOST + ":" + string(Contracts.WEBSITE_PORT) + "/me#" + hex(Contracts.user_key)
+        menu_addlink("Update profile", "
+            action_splash_web(url, 1);
+        ");
+    }
     
     menu_addback("<<< Back", "
         instance_destroy();
@@ -82,12 +76,14 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
     rectYpad = 12;
     rectIndex = 0;
     iconXOffset = 0;
-    nameXOffset = 48;
-    descXOffset = 36;
+    nameXOffset = 36;
+    descXOffset = 48;
+    pointsXOffset = rectW - 200;
     progressXOffset = rectW - 40;
     iconYOffset = 0;
     nameYOffset = 4;
     descYOffset = 18;
+    pointsYOffset = 4;
     progressYOffset = 4;
     
     h = nbPerPage*(rectH + rectYpad) + 2*rectYpad;
@@ -105,22 +101,37 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
         draw_set_alpha(0.4);
         draw_rectangle(rectX, rectY, rectX + rectW, rectY + rectH, false);
         
-        // name and desc
+        // icon
+        var completion_color;
+        if (contract_data.completed) {
+            completion_color = c_green;
+        } else if (contract_data.game_class == global.myself.class) {
+            completion_color = c_white;
+        } else {
+            completion_color = c_gray;
+        }
+        draw_sprite_ext(
+            MedAlert, 2 + contract_data.game_class,
+            rectX + 16, rectY + 16,
+            1, 1,
+            0, completion_color, 1);
+        
+        // title, description, points
         draw_set_halign(fa_left);
         draw_set_valign(fa_top);
         draw_set_alpha(1);
+        
         draw_set_color(c_white);
-        if (contract_data.owner != noone) {
-            draw_text(rectX + nameXOffset, rectY + nameYOffset, contract_data.owner.name);
-        } else {
-            draw_text(rectX + nameXOffset, rectY + nameYOffset, hex(contract_data.owner_id));
-        }
+        draw_text(rectX + nameXOffset, rectY + nameYOffset, contract_data.title);
         if (contract_data.completed) {
             draw_set_color(c_green);
         } else {
             draw_set_color(c_orange);
         }
         draw_text(rectX + descXOffset, rectY + descYOffset, contract_data.description);
+        
+        draw_set_color(c_gray);
+        draw_text(rectX + pointsXOffset, rectY + pointsYOffset, "[+" + string(contract_data.points) + " pts]");
         
         // progress
         draw_set_halign(fa_right);
