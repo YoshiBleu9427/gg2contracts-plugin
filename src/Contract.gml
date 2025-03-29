@@ -160,24 +160,24 @@ object_event_add(Contract, ev_step, ev_step_normal, '
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
-    if (global.isHost) {
-        // consolidate stats
-        switch (contract_type) {
-            case Contracts.CONTRACT_TYPE_DEBUG:
-                value_increment = 1;
-                break;
-            case Contracts.CONTRACT_TYPE_ROUNDS_PLAYED:
-                value_increment = 1;
-                break;
-            case Contracts.CONTRACT_TYPE_ROUNDS_WON:
-                if (owner != noone) {
-                    if (global.winners == owner.team) {
-                        value_increment = 1
-                    }
+    // consolidate stats
+    switch (contract_type) {
+        case Contracts.CONTRACT_TYPE_DEBUG:
+            value_increment = 1;
+            break;
+        case Contracts.CONTRACT_TYPE_ROUNDS_PLAYED:
+            value_increment = 1;
+            break;
+        case Contracts.CONTRACT_TYPE_ROUNDS_WON:
+            if (owner != noone) {
+                if (global.winners == owner.team) {
+                    value_increment = 1
                 }
-                break;
-        }
-        
+            }
+            break;
+    }
+    
+    if (global.isHost) {
         // invalidate streak contracts if not fulfilled
         switch (contract_type) {
             case Contracts.CONTRACT_TYPE_KILL_STREAK:
@@ -209,6 +209,7 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_RESTORED, '
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_INCREMENTED, '
+    if (Contracts.notify_progress)
     if (value_increment > 0) {
         with (Contracts.notification) {
             message = other.title + ": +" + string(other.value_increment);
@@ -237,8 +238,6 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_DATA_SENT, '
     } else {
         // apply the increment server-side, because backend wont send detailed updates
         value += value_increment;
-        
-        // TODO send plugin packet to owner so that the client may apply the value increment
     }
     
     // reset
