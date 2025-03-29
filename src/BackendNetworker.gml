@@ -394,7 +394,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
     }
     
     var resp, _player, pluginPacketBuffer;
-    _player = ds_map_find_value(Contracts.players_by_session_token, received_session_token); // may be -1 if player left before we received the backend response
+    _player = ds_map_find_value(Contracts.players_by_session_token, received_session_token); // may be 0 if player left before we received the backend response
     switch (command_state) {
         case Contracts.CMD_STATE_INIT:
             resp = read_ubyte(backend_socket);
@@ -407,7 +407,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
                     
                 case Contracts.NET_BACK_RESP_FAIL:
                     // client probably sent an invalid session token. Tell them it failed, then drop them
-                    if (_player != -1) {
+                    if (_player != 0) {
                         pluginPacketBuffer = buffer_create();
                         write_ubyte(pluginPacketBuffer, Contracts.NET_GAME_SRV_FAIL);
                         PluginPacketSendTo(Contracts.packetID, pluginPacketBuffer, _player);
@@ -490,7 +490,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
                 }
             }
             
-            if (_player != -1) {
+            if (_player != 0) {
                 // tell the player it worked
                 PluginPacketSendTo(Contracts.packetID, pluginPacketBuffer, _player);
             }
@@ -589,7 +589,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
             for (i = 0; i < contract_count; i += 1) {
                 contract_uuid = read_binstring(backend_socket, 16);
                 contract = ds_map_find_value(Contracts.contracts_by_uuid, contract_uuid)
-                if (contract != -1) {
+                if (contract != 0) {
                     contract.completed = true;
                 } else {
                     // this can happen for contracts of a player who left
@@ -611,7 +611,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
             
         case Contracts.CMD_STATE_EXPECT_NEW_CONTRACT_DATA:
             _player = ds_map_find_value(Contracts.players_by_session_token, received_session_token);
-            if (_player == -1) {
+            if (_player == 0) {
                 // player left before getting response from backend, ignore this data specifically
                 read_binstring(backend_socket, 20 * contract_count);
             } else {
