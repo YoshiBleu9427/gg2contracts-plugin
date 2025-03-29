@@ -71,24 +71,24 @@ CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_DEBUG]             = "DEBUG"
 
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS]           = "Kill {value} enemies"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS_ON_CLASS]  = "Get {value} kills against {class}"
-CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS_AS_CLASS]  = "Kill {value} enemies while playing as {class}"
-CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_HEALING]         = "Heal {value}00 HP"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS_AS_CLASS]  = "Kill {value} enemies as {class}"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_HEALING]         = "Heal {value}k HP"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_UBERS]           = "As healer, activate {value} superbursts"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_ROUNDS_PLAYED]   = "Play {value} rounds"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_ROUNDS_WON]      = "Win {value} rounds"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_DOMINATIONS]     = "Dominate {value} enemies"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_CAPTURES]        = "Capture {value} objectives"
-CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_STABS]           = "As Infiltrator, kill {value} enemies with stabs"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_STABS]           = "As Infiltrator, stab {value} enemies"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_BURN_DURATION]   = "Burn enemies for {value}0 seconds"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_AUTOGUN_KILLS]   = "Kill {value} enemies with your autogun"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_UBERED_KILLS]    = "Get {value} kills or assists while invicible"
-CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_DAMAGE_TAKEN]    = "Survive {value}00 damage in one life"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_DAMAGE_TAKEN]    = "Receive {value}00 damage in one life"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILL_STREAK]     = "Kill {value} enemies in one life"
-CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_HEAL_STREAK]     = "Heal {value}00 HP in one life"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_HEAL_STREAK]     = "Heal {value}k HP in one life"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_AUTOGUN_STREAK]  = "Kill {value} enemies with the same Autogun"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_FLARE_KILLS]     = "Kill {value} enemies with flares"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_GUN_KILLS]       = "Kill {value} enemies with your primary gun"
-CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_UBERED_STREAK]   = "Get {value} kills or assists in a single invincibility"
+CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_UBERED_STREAK]   = "Get {value} kills or assists in a single invuln"
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_DEBUG]           = "DEBUG"
 
 
@@ -120,7 +120,7 @@ object_event_add(Contract, ev_destroy, 0, '
 object_event_add(Contract, ev_step, ev_step_normal, '
     // update title and description
     title = Contracts.CONTRACT_TITLE_BY_TYPE[contract_type];
-    title = string_replace(description, "{class}", classname(game_class));
+    title = string_replace(title, "{class}", classname(game_class));
     
     description = Contracts.CONTRACT_DESCRIPTION_BY_TYPE[contract_type];
     description = string_replace(description, "{value}", string(target_value));
@@ -174,6 +174,19 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
                     if (global.winners == owner.team) {
                         value_increment = 1
                     }
+                }
+                break;
+        }
+        
+        // invalidate streak contracts if not fulfilled
+        switch (contract_type) {
+            case Contracts.CONTRACT_TYPE_KILL_STREAK:
+            case Contracts.CONTRACT_TYPE_HEAL_STREAK:
+            case Contracts.CONTRACT_TYPE_AUTOGUN_STREAK:
+            case Contracts.CONTRACT_TYPE_UBERED_STREAK:
+            case Contracts.CONTRACT_TYPE_DAMAGE_TAKEN:
+                if (value_increment < value) {
+                    value_increment = 0;
                 }
                 break;
         }

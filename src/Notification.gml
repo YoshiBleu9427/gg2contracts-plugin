@@ -41,12 +41,12 @@ object_event_add(Notification, ev_draw, 0, '
     var xoffset, yoffset, w, h;
     var alphaMod;
     
-    w = 360;
+    w = 320;
     h = 48;
     
     // TODO configurable position
-    xoffset = view_xview[0] + 16;
-    yoffset = view_yview[0] + 16;
+    xoffset = view_xview[0] + 8;
+    yoffset = view_yview[0] + 8;
     
     alphaMod = min(1, min(display_time / 10, max_display_time - (display_time/10)));
     
@@ -68,8 +68,8 @@ object_event_add(Notification, ev_draw, 0, '
     var i, displayed_message, text_w_ratio;
     for (i = 0; i < ds_list_size(displayed_messages); i+=1) {
         displayed_message = ds_list_find_value(displayed_messages, i);
-        text_w_ratio = min(1, w / string_width(displayed_message));
-        draw_text_transformed(xoffset + 48, yoffset + 12 * i, displayed_message, text_w_ratio, 1, 0);
+        text_w_ratio = min(1, (w-32) / string_width(displayed_message));
+        draw_text_transformed(xoffset + 32, yoffset + 12 * i, displayed_message, text_w_ratio, 1, 0);
     }
 ');
 

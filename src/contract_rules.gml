@@ -15,7 +15,7 @@ object_event_add(Character, ev_destroy, 0, '
 	if (lastDamageDealer != player)
     {
         with (Contracts.Contract) {
-            if (!completed) {
+            if (((value + value_increment) < target_value) and (!completed)) {
                 if (owner == other.lastDamageDealer) {
                     // if owner kills
                     
@@ -84,7 +84,7 @@ object_event_add(Character, ev_destroy, 0, '
                     // if owner died
                     switch (contract_type) {
                         case Contracts.CONTRACT_TYPE_KILL_STREAK:
-                        case Contracts.CONTRACT_TYPE_UBERED_STREAK:
+                        case Contracts.CONTRACT_TYPE_HEAL_STREAK:
                             value_increment = 0;
                             break;
                     }
@@ -101,7 +101,7 @@ object_event_add(Sentry, ev_destroy, 0, '
 	if (lastDamageDealer != noone)
     {
         with (Contracts.Contract) {
-            if (!completed) {
+            if (((value + value_increment) < target_value) and (!completed)) {
                 if (owner == other.ownerPlayer) {
                     // if owner died
                     switch (contract_type) {
@@ -135,14 +135,31 @@ object_event_add(Contract, ev_step, ev_step_end, '
     if (!global.isHost) exit;
     if (owner == noone) exit;
     
+    if ((value + value_increment) >= target_value) {
+        // consider it completed and hold on to that value
+        exit;
+    }
+    
+    if (global.winners != -1) {
+        // reset
+        prev_healing = 0;
+        prev_ubers = 0;
+        prev_caps = 0;
+        prev_dom_count = 0;
+        burn_duration = 0;
+        
+        exit;
+    }
+    
     switch (contract_type) {
+        case Contracts.CONTRACT_TYPE_HEAL_STREAK:
         case Contracts.CONTRACT_TYPE_HEALING:
             var heal_diff, modifier;
             heal_diff = owner.stats[HEALING] - prev_healing;
             if (heal_diff >= 100) {
-                modifier = floor(heal_diff / 100);
+                modifier = floor(heal_diff / 1000);
                 value_increment += modifier;
-                prev_healing += modifier * 100;
+                prev_healing += modifier * 1000;
             }
             break;
             
@@ -183,6 +200,13 @@ object_event_add(Contract, ev_step, ev_step_end, '
                 modifier = floor(burn_duration / 10);
                 value_increment += modifier;
                 burn_duration -= modifier * 10;
+            }
+            break;
+            
+        case Contracts.CONTRACT_TYPE_UBERED_STREAK:
+            if (owner.object != -1)
+            if (!owner.object.ubered) {
+                value_increment = 0;
             }
             break;
     }
