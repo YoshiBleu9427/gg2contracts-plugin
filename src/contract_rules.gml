@@ -16,8 +16,8 @@ object_event_add(Character, ev_destroy, 0, '
     {
         with (Contracts.Contract) {
             if (((value + value_increment) < target_value) and (!completed)) {
-                if (owner == other.lastDamageDealer) {
-                    // if owner kills
+                if ((owner != noone) and (owner == other.lastDamageDealer) and (other.player != other.lastDamageDealer)) {
+                    // if owner kills (not self)
                     
                     switch (contract_type) {
                         case Contracts.CONTRACT_TYPE_KILLS:
@@ -52,6 +52,7 @@ object_event_add(Character, ev_destroy, 0, '
                             
                         case Contracts.CONTRACT_TYPE_UBERED_KILLS:
                         case Contracts.CONTRACT_TYPE_UBERED_STREAK:
+                            if (owner.object != -1)
                             if (owner.object.ubered) {
                                 value_increment += 1;
                             }
@@ -75,6 +76,7 @@ object_event_add(Character, ev_destroy, 0, '
                     switch (contract_type) {
                         case Contracts.CONTRACT_TYPE_UBERED_KILLS:
                         case Contracts.CONTRACT_TYPE_UBERED_STREAK:
+                            if (owner.object != -1)
                             if (owner.object.ubered) {
                                 value_increment += 1;
                             }
@@ -156,7 +158,7 @@ object_event_add(Contract, ev_step, ev_step_end, '
         case Contracts.CONTRACT_TYPE_HEALING:
             var heal_diff, modifier;
             heal_diff = owner.stats[HEALING] - prev_healing;
-            if (heal_diff >= 100) {
+            if (heal_diff >= 1000) {
                 modifier = floor(heal_diff / 1000);
                 value_increment += modifier;
                 prev_healing += modifier * 1000;
