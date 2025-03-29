@@ -2,9 +2,9 @@ ViewContractsMenu = object_add();
 object_set_parent(ViewContractsMenu, OptionsController);
 object_set_depth(ViewContractsMenu, -130000); 
 object_event_add(ViewContractsMenu, ev_create, 0,'
-    menu_create(60, 320, 128, 1, 32, 0, 96, 96 + 8);
+    menu_create(48, 320, 196, 144, 32, 0, 96, 96 + 8);
     menu_setdimmed();
-    menu_background(96, 24, 8, 12, 4);
+    menu_background(196, 24, 8, 12, 4);
     
     menu_addlink("Clear completed", "
         with (Contracts.Contract) {
@@ -31,6 +31,14 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
             action_splash_web(url, 1);
         ");
     }
+    
+    menu_addedit_boolean("Notif. sounds", "Contracts.play_sounds", "
+        gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_PLAY_SOUNDS_KEY, argument0);
+    ")
+    
+    menu_addedit_boolean("Notify progress", "Contracts.notify_progress", "
+        gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_NOTIFY_PROGRESS_KEY, argument0);
+    ")
     
     menu_addback("<<< Back", "
         instance_destroy();
