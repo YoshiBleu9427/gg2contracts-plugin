@@ -110,19 +110,45 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
         draw_rectangle(rectX, rectY, rectX + rectW, rectY + rectH, false);
         
         // icon
-        var completion_color;
+        var completion_color, completable_by_any_class, class_icon;
+        
+        completable_by_any_class = true;
+        switch (contract_data.contract_type) {
+            case Contracts.CONTRACT_TYPE_KILLS_AS_CLASS:
+            case Contracts.CONTRACT_TYPE_HEALING:
+            case Contracts.CONTRACT_TYPE_UBERS:
+            case Contracts.CONTRACT_TYPE_STABS:
+            case Contracts.CONTRACT_TYPE_BURN_DURATION:
+            case Contracts.CONTRACT_TYPE_AUTOGUN_KILLS:
+            case Contracts.CONTRACT_TYPE_HEAL_STREAK:
+            case Contracts.CONTRACT_TYPE_AUTOGUN_STREAK:
+            case Contracts.CONTRACT_TYPE_FLARE_KILLS:
+            case Contracts.CONTRACT_TYPE_GUN_KILLS:
+                completable_by_any_class = false;
+                break;
+        }
+        
         if (contract_data.completed) {
             completion_color = c_green;
-        } else if (contract_data.game_class == global.myself.class) {
+        } else if (completable_by_any_class or (contract_data.game_class == global.myself.class)) {
             completion_color = c_white;
         } else {
             completion_color = c_gray;
         }
-        draw_sprite_ext(
-            MedAlert, 2 + contract_data.game_class,
-            rectX + 16, rectY + 16,
-            1, 1,
-            0, completion_color, 1);
+        
+        if (completable_by_any_class) {
+            draw_sprite_ext(
+                Contracts.img_contract_icon, 0,
+                rectX + 4, rectY + 4,
+                1, 1,
+                0, completion_color, 1);
+        } else {
+            draw_sprite_ext(
+                MedAlert, 2 + contract_data.game_class,
+                rectX + 16, rectY + 16,
+                1, 1,
+                0, completion_color, 1);
+        }
         
         // title, description, points
         draw_set_halign(fa_left);

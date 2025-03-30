@@ -16,6 +16,7 @@ snd_increase    = sound_add(directory + "\sounds\increase.mp3", 0, true);
 snd_success     = sound_add(directory + "\sounds\success.mp3", 0, true);
 
 img_notification_icon = sprite_add(directory + "\images\notification_icon.png", 1, true, false, 0, 0);
+img_contract_icon = sprite_add(directory + "\images\contract_icon.png", 1, true, false, 0, 0);
 
 
 contracts_by_uuid = ds_map_create();
