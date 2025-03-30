@@ -12,12 +12,12 @@ with (Character) {
 object_event_add(Character, ev_destroy, 0, '
     if (global.isHost)
     if (global.winners == -1)
-	if (lastDamageDealer != player)
-    {
+	if (lastDamageDealer != player) {
         with (Contracts.Contract) {
+            if (owner != noone)
             if (((value + value_increment) < target_value) and (!completed)) {
-                if ((owner != noone) and (owner == other.lastDamageDealer) and (other.player != other.lastDamageDealer)) {
-                    // if owner kills (not self)
+                if (owner == other.lastDamageDealer) {
+                    // if owner kills
                     
                     switch (contract_type) {
                         case Contracts.CONTRACT_TYPE_KILLS:
@@ -81,6 +81,26 @@ object_event_add(Character, ev_destroy, 0, '
                                 value_increment += 1;
                             }
                             break;
+                    }
+                } else if (owner.class == CLASS_MEDIC) {
+                    // assists by healing
+                    var assistant;
+                    assistant = noone;
+                    with(other.lastDamageDealer)
+                        if (object)
+                            if (object.healer)
+                                assistant = object.healer;
+                            
+                    if (assistant != noone) and (owner == assistant) {
+                        switch (contract_type) {
+                            case Contracts.CONTRACT_TYPE_UBERED_KILLS:
+                            case Contracts.CONTRACT_TYPE_UBERED_STREAK:
+                                if (owner.object != -1)
+                                if (owner.object.ubered) {
+                                    value_increment += 1;
+                                }
+                                break;
+                        }
                     }
                 } else if (owner == other.player) {
                     // if owner died
