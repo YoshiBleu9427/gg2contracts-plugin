@@ -220,7 +220,9 @@ global.dealDamageFunction += '
     if (global.isHost) {
         // CONTRACT_TYPE_DAMAGE_TAKEN
         with (argument1) {
-            if (variable_local_exists("contracts__damage_taken")) {
+            if (variable_local_exists("contracts__damage_taken"))
+            if (variable_local_exists("player"))
+            if (argument0 != argument1.player) {
                 contracts__damage_taken += argument2;
             }
         }
