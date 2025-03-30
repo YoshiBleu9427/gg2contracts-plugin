@@ -9,12 +9,12 @@ with (Player) {
 }
 
 object_event_add(Player, ev_destroy, 0, '
-    if (Contracts_has_plugin) {
-        ds_map_delete(Contracts.players_by_session_token, Contracts_session_token);
+    if (Contracts_session_token != "") {
         with (Contracts.Contract) {
-            if (owner == other.id) {
+            if (owner_id == other.Contracts_session_token) {
                 owner = noone;
             }
         }
+        ds_map_delete(Contracts.players_by_session_token, Contracts_session_token);
     }
 ');
