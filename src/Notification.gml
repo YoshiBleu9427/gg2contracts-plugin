@@ -4,14 +4,17 @@ object_set_depth(Notification, -12000);
 
 EVT_NOTIFY = ev_user0;
 
-object_event_add(Notification, ev_create, 0, '
+notification = instance_create(0, 0, Notification);
+with(notification) {
+    base_x = Contracts.notification_xoffset;
+    base_y = Contracts.notification_yoffset;
+    
     message = "";
     display_time = 0;
     max_display_time = 120;
     sound = noone;
-    
     displayed_messages = ds_list_create();
-');
+}
 
 object_event_add(Notification, ev_destroy, 0, '
     ds_list_destroy(displayed_messages);
@@ -35,6 +38,9 @@ object_event_add(Notification, ev_step, ev_step_end, '
 ');
 
 object_event_add(Notification, ev_draw, 0, '
+    if (!Contracts.display_notifications) {
+        exit;
+    }
     if (display_time <= 0) {
         exit;
     }
@@ -44,9 +50,8 @@ object_event_add(Notification, ev_draw, 0, '
     w = 320;
     h = 48;
     
-    // TODO configurable position
-    xoffset = view_xview[0] + 8;
-    yoffset = view_yview[0] + 8;
+    xoffset = view_xview[0] + base_x;
+    yoffset = view_yview[0] + base_y;
     
     alphaMod = min(1, min(display_time / 10, max_display_time - (display_time/10)));
     
@@ -96,12 +101,3 @@ object_event_add(Notification, ev_other, EVT_NOTIFY, '
         sound = noone;
     }
 ');
-
-notification = instance_create(0, 0, Notification);
-with(notification) {
-    message = "";
-    display_time = 0;
-    max_display_time = 120;
-    sound = noone;
-    displayed_messages = ds_list_create();
-}

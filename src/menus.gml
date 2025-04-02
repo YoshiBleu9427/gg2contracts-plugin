@@ -32,6 +32,14 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
         ");
     }
     
+    menu_addedit_boolean("Tracker", "Contracts.display_tracker", "
+        gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_DISPLAY_TRACKER_KEY, argument0);
+    ")
+    
+    menu_addedit_boolean("Notifications", "Contracts.display_notifications", "
+        gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_DISPLAY_NOTIFICATIONS_KEY, argument0);
+    ")
+    
     menu_addedit_boolean("Notif. sounds", "Contracts.play_sounds", "
         gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_PLAY_SOUNDS_KEY, argument0);
     ")

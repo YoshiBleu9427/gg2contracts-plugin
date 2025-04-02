@@ -58,14 +58,14 @@ CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_CAPTURES]          = "Captures"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_STABS]             = "Stabs"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_BURN_DURATION]     = "Burn duration"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_AUTOGUN_KILLS]     = "Autogun kills"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERED_KILLS]      = "Kills while invicible"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERED_KILLS]      = "Kills while invuln"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_DAMAGE_TAKEN]      = "Tank damage"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_KILL_STREAK]       = "Kill streak"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_HEAL_STREAK]       = "Heals in one life"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_AUTOGUN_STREAK]    = "Single Autogun kills"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_FLARE_KILLS]       = "Flare kills"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_GUN_KILLS]         = "Gun kills"
-CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERED_STREAK]     = "Kill streak while invicible"
+CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_UBERED_STREAK]     = "Kill streak while invuln"
 CONTRACT_TITLE_BY_TYPE[CONTRACT_TYPE_DEBUG]             = "DEBUG"
 
 CONTRACT_DESCRIPTION_BY_TYPE[CONTRACT_TYPE_KILLS]           = "Kill {value} enemies"
@@ -206,6 +206,10 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_INCREMENTED, '
             message = other.title + ": +" + string(other.value_increment);
             sound = Contracts.snd_increase;
             event_perform(ev_other, Contracts.EVT_NOTIFY);
+        }
+        with (Contracts.tracker) {
+            contract = other.id;
+            event_perform(ev_other, Contracts.EVT_TRACKER_INCREMENT);
         }
     }
 ');

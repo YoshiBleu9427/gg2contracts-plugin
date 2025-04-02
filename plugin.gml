@@ -17,6 +17,7 @@ snd_success     = sound_add(directory + "\sounds\success.mp3", 0, true);
 
 img_notification_icon = sprite_add(directory + "\images\notification_icon.png", 1, true, false, 0, 0);
 img_contract_icon = sprite_add(directory + "\images\contract_icon.png", 1, true, false, 0, 0);
+img_tracker_bg = sprite_add(directory + "\images\tracker_bg.png", 1, true, false, 0, 0);
 
 
 contracts_by_uuid = ds_map_create();
@@ -40,4 +41,5 @@ execute_file(directory + "\src\PluginNetworker.gml");
 execute_file(directory + "\src\RoundEndObserver.gml");
 execute_file(directory + "\src\contract_rules.gml");
 execute_file(directory + "\src\menus.gml");
+execute_file(directory + "\src\ContractTracker.gml");
 execute_file(directory + "\src\Notification.gml");
