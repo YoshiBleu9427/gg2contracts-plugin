@@ -14,7 +14,6 @@ EVT_CONTRACT_ON_MAP_END = ev_user1;
 EVT_CONTRACT_ON_DATA_SENT = ev_user2;
 EVT_CONTRACT_ON_INCREMENTED = ev_user3;
 EVT_CONTRACT_ON_COMPLETED = ev_user4;
-EVT_CONTRACT_ON_RESTORED = ev_user5;
 
 
 
@@ -197,14 +196,6 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
         // so assume increment will apply
         value += value_increment;
         value_increment = 0;
-    }
-');
-
-object_event_add(Contract, ev_other, EVT_CONTRACT_ON_RESTORED, '
-    with (Contracts.notification) {
-        message = other.title + ": +" + string(other.value_increment);
-        sound = Contracts.snd_beep;
-        event_perform(ev_other, Contracts.EVT_NOTIFY);
     }
 ');
 

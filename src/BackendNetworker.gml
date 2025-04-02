@@ -461,7 +461,6 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
                         found_contract = ds_map_find_value(Contracts.contracts_by_uuid, contract_id);
                         with (found_contract) {
                             owner = _player;
-                            event_perform(ev_other, Contracts.EVT_CONTRACT_ON_RESTORED);
                         }
                         
                         // also sync value_increment
