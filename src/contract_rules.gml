@@ -178,10 +178,10 @@ object_event_add(Contract, ev_step, ev_step_end, '
         case Contracts.CONTRACT_TYPE_HEALING:
             var heal_diff, modifier;
             heal_diff = owner.stats[HEALING] - prev_healing;
-            if (heal_diff >= 1000) {
-                modifier = floor(heal_diff / 1000);
+            if (heal_diff >= 100) {
+                modifier = floor(heal_diff / 100);
                 value_increment += modifier;
-                prev_healing += modifier * 1000;
+                prev_healing += modifier * 100;
             }
             break;
             
