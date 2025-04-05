@@ -200,16 +200,16 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_INCREMENTED, '
-    if (Contracts.notify_progress)
     if (value_increment > 0) {
-        with (Contracts.notification) {
-            message = other.title + ": +" + string(other.value_increment);
-            sound = Contracts.snd_increase;
-            event_perform(ev_other, Contracts.EVT_NOTIFY);
-        }
         with (Contracts.tracker) {
             contract = other.id;
             event_perform(ev_other, Contracts.EVT_TRACKER_INCREMENT);
+            
+            if (Contracts.notify_progress) {
+                message = other.title + ": +" + string(other.value_increment);
+                sound = Contracts.snd_increase;
+                event_perform(ev_other, Contracts.EVT_TRACKER_NOTIFY);
+            }
         }
     }
 ');
@@ -217,10 +217,14 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_INCREMENTED, '
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_COMPLETED, '
     value_increment = 0;
     value = target_value;
-    with (Contracts.notification) {
-        message = "Completed contract! " + other.description;
+    with (Contracts.tracker) {
+        message = "Completed contract!";
         sound = Contracts.snd_success;
-        event_perform(ev_other, Contracts.EVT_NOTIFY);
+        event_perform(ev_other, Contracts.EVT_TRACKER_NOTIFY);
+
+        message = other.description;
+        sound = Contracts.snd_beep;
+        event_perform(ev_other, Contracts.EVT_TRACKER_NOTIFY);
     }
 ');
 

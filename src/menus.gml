@@ -23,6 +23,11 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
             }
             map_key = ds_map_find_next(Contracts.contracts_by_uuid, map_key);
         }
+        
+        // TODO probably bad that I have to do this here idk
+        with (Contracts.tracker) {
+            event_perform(ev_other, Contracts.EVT_TRACKER_UPDATE_LIST);
+        }
     ");
     
     if (Contracts.user_key != "") {
