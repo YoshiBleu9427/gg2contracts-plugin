@@ -178,6 +178,19 @@ object_event_add(Contract, ev_step, ev_step_end, '
         case Contracts.CONTRACT_TYPE_HEALING:
             var heal_diff, modifier;
             heal_diff = owner.stats[HEALING] - prev_healing;
+            
+            // to prevent cheesing this contract by healing an unscathed target,
+            // we only take 25% of the healing into consideration
+            // do this by fast-forwarding the already-counted healing
+            if (owner.object != -1)
+            if (owner.object.currentWeapon.object_index == Medigun)
+            if (instance_exists(owner.object.currentWeapon.healTarget))
+            if (owner.object.currentWeapon.healTarget.object != -1)
+            if (owner.object.currentWeapon.healTarget.object.hp == owner.object.currentWeapon.healTarget.object.maxHp)
+            if (owner.object.currentWeapon.healTarget.object.timeUnscathed > 4) {
+                prev_healing += 0.75 * heal_diff;
+            }
+            
             if (heal_diff >= 100) {
                 modifier = floor(heal_diff / 100);
                 value_increment += modifier;

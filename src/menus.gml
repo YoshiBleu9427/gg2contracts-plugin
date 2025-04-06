@@ -35,6 +35,19 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
         menu_addlink("Update profile", "
             action_splash_web(url, 1);
         ");
+    } else {
+        sent_signup_form = false;
+        next_menu_name = "Signing up...";
+        menu_addlink("Sign up", "
+            if (!sent_signup_form) {
+                item_name[virtualitem] = next_menu_name
+                with (instance_create(0, 0, Contracts.ClientBackendNetworker)) {
+                    event_perform(ev_other, Contracts.EVT_SEND_HELLO);
+                    on_hello_command = Contracts.EVT_SEND_CLT_NEW_ACCOUNT;
+                    destroy_on_queue_empty = true;
+                }
+            }
+        ");
     }
     
     menu_addedit_boolean("Tracker", "Contracts.display_tracker", "

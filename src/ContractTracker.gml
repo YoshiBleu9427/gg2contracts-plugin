@@ -145,9 +145,8 @@ object_event_add(Tracker, ev_other, EVT_TRACKER_PLAY_SOUND, '
 
 object_event_add(Tracker, ev_draw, 0, '
     if (instance_exists(MenuController)) exit;
-    if (!Contracts.display_tracker) exit;
     if (ds_list_size(contracts) == 0) exit;
-    if (global.myself.object == -1) exit;
+    // if (global.myself.object == -1) exit; // TODO option to hide when dead
     
     var xoffset, yoffset, w, h;
     var alphaMod;
@@ -157,7 +156,7 @@ object_event_add(Tracker, ev_draw, 0, '
     yoffset = view_yview[0] + base_y;
     
     alphaMod = 0.8;
-    maxStringLen = 32;
+    maxStringLen = 20;
     
     w = 160;
     h = 13;
@@ -166,6 +165,7 @@ object_event_add(Tracker, ev_draw, 0, '
     draw_set_valign(fa_top);
     draw_set_alpha(alphaMod);
     
+    if (Contracts.display_notifications)
     if (ds_list_size(notifications_text) > 0) {
         var text_notification;
         text_notification = ds_list_find_value(notifications_text, 0);
@@ -177,7 +177,10 @@ object_event_add(Tracker, ev_draw, 0, '
             0, c_white, alphaMod);
         
         if (string_length(text_notification) > maxStringLen) {
-            text = string_copy(text, 1, maxStringLen);
+            var str_start, time_ratio;
+            time_ratio = alarm[Contracts.ALARM_TRACKER_NEXT_TEXT_NOTIFICATION] / (Contracts.TRACKER_NOTIFICATION_DISPLAY_TIME/global.delta_factor);
+            str_start = 1 + round((1-time_ratio) * (string_length(text_notification) - maxStringLen));
+            text_notification = string_copy(text_notification, str_start, maxStringLen);
         }
         text_w_ratio = min(1, 146 / string_width(text_notification));
         
@@ -185,7 +188,10 @@ object_event_add(Tracker, ev_draw, 0, '
         draw_text_transformed(xoffset + 89, yoffset - 19, text_notification, text_w_ratio, 1, 0);
     }
     
+    if (!Contracts.display_tracker) exit;
+    
     draw_set_halign(fa_left);
+    maxStringLen = 32;
     
     draw_sprite_ext(
         Contracts.img_tracker_bg, 0,
