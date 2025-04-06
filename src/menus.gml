@@ -66,6 +66,8 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
         gg2_write_ini(Contracts.INI_SECTION, Contracts.INI_NOTIFY_PROGRESS_KEY, argument0);
     ")
     
+    menu_addlink("", "");
+    
     menu_addback("<<< Back", "
         instance_destroy();
         instance_create(0,0,InGameMenuController);
@@ -91,9 +93,9 @@ object_event_add(ViewContractsMenu, ev_destroy, 0,'
 object_event_add(ViewContractsMenu, ev_draw, 0, '
     event_inherited();
     var xoffset, yoffset, w, h;
-    xoffset = view_xview[0] + 240;
-    yoffset = view_yview[0] + 84;
-    w = view_wview[0] - 300;
+    xoffset = view_xview[0] + 48 + 230;
+    yoffset = view_yview[0] + 90;
+    w = view_wview[0] - (48 + 230 + 48);
     //h = view_hview[0] - 220;
     
     nbOffset = 0;
@@ -112,7 +114,7 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
     iconXOffset = 0;
     nameXOffset = 36;
     descXOffset = 48;
-    pointsXOffset = rectW - 200;
+    pointsXOffset = rectW - 180;
     progressXOffset = rectW - 40;
     iconYOffset = 0;
     nameYOffset = 4;
@@ -228,6 +230,17 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
         
         rectIndex += 1;
     }
+    
+    // Display points
+    xoffset = view_xview[0] + 48;
+    yoffset = view_yview[0] + 240;
+    draw_set_alpha(1);
+    draw_set_halign(fa_left);
+    draw_set_color(c_gray);
+    draw_text(xoffset, yoffset, "Points earned#this session:");
+    draw_set_halign(fa_right);
+    draw_set_color(c_white);
+    draw_text_transformed(xoffset + 190, yoffset, string(Contracts.session_points), 2, 2, 0);
 ');
 
 object_event_add(InGameMenuController, ev_create, 0, '

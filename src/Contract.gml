@@ -226,6 +226,10 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_COMPLETED, '
         sound = Contracts.snd_beep;
         event_perform(ev_other, Contracts.EVT_TRACKER_NOTIFY);
     }
+    if (owner == global.myself) {
+        Contracts.user_points += points;
+        Contracts.session_points += points;
+    }
 ');
 
 // TODO run this event on data sent AND backend replies positively

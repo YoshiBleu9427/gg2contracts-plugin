@@ -25,7 +25,9 @@ contracts_by_uuid = ds_map_create();
 players_by_session_token = ds_map_create();
 
 user_key = ""
+user_points = 0  // TODO
 session_token = ""
+session_points = 0
 
 joined_server_id = ""
 
