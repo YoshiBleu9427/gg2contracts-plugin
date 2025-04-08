@@ -84,6 +84,14 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
         }
         map_key = ds_map_find_next(Contracts.contracts_by_uuid, map_key);
     }
+    
+    paulas_text = choose(
+        "We issue no refunds#for the loss of#limbs, organs,#friends, family,#sense of self-#preservation, self-worth,#meaning, humor,#money, or blood.",
+        "When we make money,#you make money!##  Cash out your#  canadium on#  August 1st!",
+        "Raybann, Co. converts#the canadium you make#into canadian dollars.##We even keep it safe#for you, in our bank#accounts, free of#charge!",
+        "Update your profile#to change your main#class, and get#contracts that#suit you better!",
+        "Contractors who#perform exceptionally#well may be entitled#to an exclusive#reward!##  Try to reach#  20.000 canadium!",
+    );
 ');
 
 object_event_add(ViewContractsMenu, ev_destroy, 0,'
@@ -193,7 +201,7 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
         draw_text(rectX + descXOffset, rectY + descYOffset, contract_data.description);
         
         draw_set_color(c_gray);
-        draw_text(rectX + pointsXOffset, rectY + pointsYOffset, "[+" + string(contract_data.points) + " pts]");
+        draw_text(rectX + pointsXOffset, rectY + pointsYOffset, "[+" + string(contract_data.points) + " C$]");
         
         // progress
         draw_set_halign(fa_right);
@@ -231,16 +239,43 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
         rectIndex += 1;
     }
     
-    // Display points
+    // Display paulas text blurb
     xoffset = view_xview[0] + 48;
+    yoffset = view_yview[0] + 40;
+    draw_set_valign(fa_top);
+    draw_set_halign(fa_left);
+    draw_set_color(c_black);
+    draw_set_alpha(0.4);
+    draw_rectangle(xoffset, yoffset, xoffset + 177, yoffset + 168, false);
+    draw_set_color(c_gray);
+    draw_rectangle(xoffset, yoffset, xoffset + 177, yoffset + 168, true);
+    draw_rectangle(xoffset + 1, yoffset + 1, xoffset + 176, yoffset + 167, true);
+    
+    draw_set_alpha(1);
+    draw_set_color(c_teal);
+    draw_sprite_ext(Contracts.img_paula_icon, 0, xoffset, yoffset, 2, 2, 0, c_white, 1);
+    
+    draw_text_transformed(xoffset + 72, yoffset + 16, "Forget# not!", 2, 2, 0);
+    draw_text(xoffset + 4, yoffset + 72, paulas_text);
+    
+    
+    // Display points
     yoffset = view_yview[0] + 240;
     draw_set_alpha(1);
     draw_set_halign(fa_left);
     draw_set_color(c_gray);
-    draw_text(xoffset, yoffset, "Points earned#this session:");
+    draw_text(xoffset, yoffset, "Canadium made#this session:");
     draw_set_halign(fa_right);
     draw_set_color(c_white);
-    draw_text_transformed(xoffset + 190, yoffset, string(Contracts.session_points), 2, 2, 0);
+    draw_text_transformed(xoffset + 181, yoffset + 1, string(Contracts.session_points), 2, 2, 0);
+    
+    yoffset = view_yview[0] + 280;
+    draw_set_halign(fa_left);
+    draw_set_color(c_gray);
+    draw_text(xoffset, yoffset, "Total C$:");
+    draw_set_halign(fa_right);
+    draw_set_color(c_white);
+    draw_text(xoffset + 180, yoffset, string(Contracts.user_points));
 ');
 
 object_event_add(InGameMenuController, ev_create, 0, '

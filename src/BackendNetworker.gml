@@ -278,7 +278,7 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_SEND_CLT_NEW_ACCOUNT, '
     write_ubyte(backend_socket, Contracts.NET_BACK_REQ_NEW_ACCOUNT);
     write_ubyte(backend_socket, string_length(global.playerName));
     write_string(backend_socket, global.playerName);
-    write_ubyte(backend_socket, CLASS_SOLDIER);  // TODO
+    write_ubyte(backend_socket, global.myself.class);
     socket_send(backend_socket);
     
     expected_byte_count += 16;
@@ -305,7 +305,7 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_SEND_CLT_JOIN_SERVER, '
     write_binstring(backend_socket, Contracts.joined_server_id);
     socket_send(backend_socket);
     
-    expected_byte_count += 16 + 1;
+    expected_byte_count += 16 + 4 + 1;
     next_handler_event = Contracts.EVT_HANDLE_CLT_JOIN_SERVER;
 ');
 
@@ -313,6 +313,7 @@ object_event_add(ClientBackendNetworker, ev_other, EVT_HANDLE_CLT_JOIN_SERVER, '
     switch(command_state) {
         case Contracts.CMD_STATE_INIT:
             Contracts.session_token = read_binstring(backend_socket, 16);
+            Contracts.user_points = read_uint(backend_socket);
             contract_count = read_ubyte(backend_socket);
             expected_byte_count += contract_count * 21;
             command_state = Contracts.CMD_STATE_EXPECT_RESPONSE;

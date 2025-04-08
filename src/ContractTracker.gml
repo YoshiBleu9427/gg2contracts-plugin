@@ -185,7 +185,7 @@ object_event_add(Tracker, ev_draw, 0, '
         text_w_ratio = min(1, 146 / string_width(text_notification));
         
         draw_set_color(c_white);
-        draw_text_transformed(xoffset + 89, yoffset - 19, text_notification, text_w_ratio, 1, 0);
+        draw_text_transformed(xoffset + 84, yoffset - 16, text_notification, text_w_ratio, 1, 0);
     }
     
     if (!Contracts.display_tracker) exit;

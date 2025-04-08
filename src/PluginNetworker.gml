@@ -60,15 +60,8 @@ object_event_add(PluginNetworker, ev_create, 0, '
     
     if (!(global.isHost && global.dedicatedMode)) {
         if (Contracts.user_key == "") {
-            if (!show_question("Welcome to Contracts!##Play the game. Complete missions. Earn points!#Score a lot and earn prices!##Would you like to sign up?")) { // TODO better signup form
-                // TODO choice to paste an existing key
-                show_message("Sadge"); // TODO probably just say nothing
-            } else {
-                with (instance_create(0, 0, Contracts.ClientBackendNetworker)) {
-                    event_perform(ev_other, Contracts.EVT_SEND_HELLO);
-                    on_hello_command = Contracts.EVT_SEND_CLT_NEW_ACCOUNT;
-                    destroy_on_queue_empty = true;
-                }
+            if (!Contracts.disable_signup_popup) {
+                instance_create(0, 0, Contracts.SignupPopup);
             }
         }
     }
