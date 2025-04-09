@@ -18,7 +18,7 @@ object_event_add(SignupPopup, ev_step, ev_step_end, '
 
 object_event_add(SignupPopup, ev_other, EVT_SIGNUP_SHOW, '
     var prompt;
-    prompt = "Welcome to Contracts!##Play the game. Complete missions. Earn points!#Score a lot and earn prices!##Would you like to sign up?";
+    prompt = "Welcome to Contracts!##Play the game. Complete missions. Earn points!#Score a lot and earn prizes!##Would you like to sign up?";
     
     switch (show_message_ext(prompt, "Yes", "Not now", "Never")) {
         case 1:

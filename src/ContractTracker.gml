@@ -131,7 +131,7 @@ object_event_add(Tracker, ev_other, EVT_TRACKER_NOTIFY, '
 ');
 
 object_event_add(Tracker, ev_other, EVT_TRACKER_PLAY_SOUND, '
-    // TODO disable if F12
+    if (!AudioControl.allAudioMuted)
     if (Contracts.play_sounds)
     if (sound != -1)
     if (sound != noone) {
