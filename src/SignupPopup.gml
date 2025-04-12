@@ -10,6 +10,7 @@ object_event_add(SignupPopup, ev_create, 0, '
 ');
 
 object_event_add(SignupPopup, ev_step, ev_step_end, '
+    visible = (global.myself.object != -1);
     x = view_xview[0] + 48;
     y = view_yview[0] + 80;
     
