@@ -31,7 +31,7 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
     ");
     
     if (Contracts.user_key != "") {
-        url = "http://" + Contracts.WEBSITE_HOST + ":" + string(Contracts.WEBSITE_PORT) + "/me#" + hex(Contracts.user_key)
+        url = Contracts.WEBSITE_URL + "/me#" + hex(Contracts.user_key)
         menu_addlink("Update profile", "
             action_splash_web(url, 1);
         ");

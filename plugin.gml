@@ -2,12 +2,10 @@ globalvar Contracts;
 Contracts = id;
 
 
+BACKEND_HOST = "gg2.ybot.fr"
+BACKEND_PORT = 51061
 
-BACKEND_HOST = "localhost"
-BACKEND_PORT = 4646
-
-WEBSITE_HOST = BACKEND_HOST
-WEBSITE_PORT = 51062
+WEBSITE_URL = "https://gg2.ybot.fr"
 
 
 snd_beep        = sound_add(directory + "\sounds\beep.mp3", 0, true);
