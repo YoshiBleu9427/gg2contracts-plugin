@@ -87,10 +87,10 @@ object_event_add(ViewContractsMenu, ev_create, 0,'
     
     paulas_text = choose(
         "We issue no refunds#for the loss of#limbs, organs,#friends, family,#sense of self-#preservation, self-worth,#meaning, humor,#money, or blood.",
-        "When we make money,#you make money!##  Cash out your#  canadium on#  August 1st!",
-        "Raybann, Co. converts#the canadium you make#into canadian dollars.##We even keep it safe#for you, in our bank#accounts, free of#charge!",
+        "When we make money,#you make money!##  Cash out your#  canadium on#  August 5th!",
+        "Bann Group converts#the canadium you make#into canadian dollars.##We even keep it safe#for you, in our bank#accounts, free of#charge!",
         "Update your profile#to change your main#class, and get#contracts that#suit you better!",
-        "Contractors who#perform exceptionally#well may be entitled#to an exclusive#reward!##  Try to reach#  20.000 canadium!",
+        "Contractors who#perform exceptionally#well may be entitled#to an exclusive#reward!##  Try to reach#  5.000 canadium!",
     );
 ');
 

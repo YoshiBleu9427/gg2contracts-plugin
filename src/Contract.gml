@@ -184,7 +184,7 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
             case Contracts.CONTRACT_TYPE_AUTOGUN_STREAK:
             case Contracts.CONTRACT_TYPE_UBERED_STREAK:
             case Contracts.CONTRACT_TYPE_DAMAGE_TAKEN:
-                if (value_increment < value) {
+                if (value_increment < target_value) {
                     value_increment = 0;
                 }
                 break;
