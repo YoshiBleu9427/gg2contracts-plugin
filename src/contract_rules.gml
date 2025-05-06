@@ -102,7 +102,8 @@ object_event_add(Character, ev_destroy, 0, '
                                 break;
                         }
                     }
-                } else if (owner == other.player) {
+                }
+                if (owner == other.player) {
                     // if owner died
                     switch (contract_type) {
                         case Contracts.CONTRACT_TYPE_KILL_STREAK:
