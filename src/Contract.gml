@@ -159,11 +159,10 @@ object_event_add(Contract, ev_step, ev_step_normal, '
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
-    // consolidate stats
     switch (contract_type) {
+        
+        // consolidate stats
         case Contracts.CONTRACT_TYPE_DEBUG:
-            value_increment = 1;
-            break;
         case Contracts.CONTRACT_TYPE_ROUNDS_PLAYED:
             value_increment = 1;
             break;
@@ -174,24 +173,22 @@ object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
                 }
             }
             break;
+            
+        // invalidate streak contracts if not fulfilled
+        case Contracts.CONTRACT_TYPE_KILL_STREAK:
+        case Contracts.CONTRACT_TYPE_HEAL_STREAK:
+        case Contracts.CONTRACT_TYPE_AUTOGUN_STREAK:
+        case Contracts.CONTRACT_TYPE_UBERED_STREAK:
+        case Contracts.CONTRACT_TYPE_DAMAGE_TAKEN:
+            if (value_increment < target_value) {
+                value_increment = 0;
+            }
+            break;
     }
     
-    if (global.isHost) {
-        // invalidate streak contracts if not fulfilled
-        switch (contract_type) {
-            case Contracts.CONTRACT_TYPE_KILL_STREAK:
-            case Contracts.CONTRACT_TYPE_HEAL_STREAK:
-            case Contracts.CONTRACT_TYPE_AUTOGUN_STREAK:
-            case Contracts.CONTRACT_TYPE_UBERED_STREAK:
-            case Contracts.CONTRACT_TYPE_DAMAGE_TAKEN:
-                if (value_increment < target_value) {
-                    value_increment = 0;
-                }
-                break;
-        }
-        
-        value_increment = floor(value_increment);
-    } else {
+    value_increment = floor(value_increment);
+    
+    if (!global.isHost) {
         // as client, the server will never udpate ongoing contracts
         // so assume increment will apply
         value += value_increment;
