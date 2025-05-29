@@ -88,6 +88,17 @@ object_event_add(PluginNetworker, ev_create, 0, '
 ');
 
 
+// TODO handle Tracker better
+object_event_add(PluginNetworker, ev_destroy, 0, '
+    with (Contracts.Contract) {
+        instance_destroy();
+    }
+    with (Contracts.Tracker) {
+        event_perform(ev_other, Contracts.EVT_TRACKER_UPDATE_LIST);
+    }
+');
+
+
 //  As a client, tell server youre ready to connect as soon as you get your user key
 //
 object_event_add(PluginNetworker, ev_step, ev_step_normal, '
