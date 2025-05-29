@@ -4,10 +4,22 @@
 
 object_event_add(Character, ev_create, 0, '
     contracts__damage_taken = 0;
+    contracts__time_since_uber = 999;
 ');
 with (Character) {
     contracts__damage_taken = 0;
+    contracts__time_since_uber = 999;
 }
+
+UBER_TIMER_CUTOFF = 5 * 30; // in 30fps frames
+
+object_event_add(Character, ev_step, ev_step_normal, '
+    if (ubered) {
+        contracts__time_since_uber = 0;
+    } else {
+        contracts__time_since_uber += global.delta_factor;
+    }
+');
 
 object_event_add(Character, ev_destroy, 0, '
     if (global.isHost)
@@ -53,7 +65,7 @@ object_event_add(Character, ev_destroy, 0, '
                         case Contracts.CONTRACT_TYPE_UBERED_KILLS:
                         case Contracts.CONTRACT_TYPE_UBERED_STREAK:
                             if (owner.object != -1)
-                            if (owner.object.ubered) {
+                            if (owner.object.contracts__time_since_uber <= Contracts.UBER_TIMER_CUTOFF) {
                                 value_increment += 1;
                             }
                             break;
@@ -77,7 +89,7 @@ object_event_add(Character, ev_destroy, 0, '
                         case Contracts.CONTRACT_TYPE_UBERED_KILLS:
                         case Contracts.CONTRACT_TYPE_UBERED_STREAK:
                             if (owner.object != -1)
-                            if (owner.object.ubered) {
+                            if (owner.object.contracts__time_since_uber <= Contracts.UBER_TIMER_CUTOFF) {
                                 value_increment += 1;
                             }
                             break;
@@ -96,7 +108,7 @@ object_event_add(Character, ev_destroy, 0, '
                             case Contracts.CONTRACT_TYPE_UBERED_KILLS:
                             case Contracts.CONTRACT_TYPE_UBERED_STREAK:
                                 if (owner.object != -1)
-                                if (owner.object.ubered) {
+                                if (owner.object.contracts__time_since_uber <= Contracts.UBER_TIMER_CUTOFF) {
                                     value_increment += 1;
                                 }
                                 break;
@@ -241,7 +253,7 @@ object_event_add(Contract, ev_step, ev_step_end, '
             
         case Contracts.CONTRACT_TYPE_UBERED_STREAK:
             if (owner.object != -1)
-            if (!owner.object.ubered) {
+            if (owner.object.contracts__time_since_uber > Contracts.UBER_TIMER_CUTOFF) {
                 value_increment = 0;
             }
             break;
