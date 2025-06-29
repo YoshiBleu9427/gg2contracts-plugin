@@ -263,6 +263,7 @@ object_event_add(Contract, ev_step, ev_step_end, '
 
 // dealDamage( sourcePlayer, damagedObject, damageDealt )
 global.dealDamageFunction += '
+    if (object_is_ancestor(argument1.object_index, Character) or argument1.object_index == Character)
     if (global.isHost) {
         // CONTRACT_TYPE_DAMAGE_TAKEN
         with (argument1) {
