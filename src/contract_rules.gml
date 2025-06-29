@@ -5,10 +5,12 @@
 object_event_add(Character, ev_create, 0, '
     contracts__damage_taken = 0;
     contracts__time_since_uber = 999;
+    contracts__hit_by_flying_sticky_this_frame = false;
 ');
 with (Character) {
     contracts__damage_taken = 0;
     contracts__time_since_uber = 999;
+    contracts__hit_by_flying_sticky_this_frame = false;
 }
 
 UBER_TIMER_CUTOFF = 5 * 30; // in 30fps frames
@@ -19,6 +21,10 @@ object_event_add(Character, ev_step, ev_step_normal, '
     } else {
         contracts__time_since_uber += global.delta_factor;
     }
+');
+
+object_event_add(Character, ev_step, ev_step_end, '
+    contracts__hit_by_flying_sticky_this_frame = false;
 ');
 
 object_event_add(Character, ev_destroy, 0, '
@@ -49,6 +55,12 @@ object_event_add(Character, ev_destroy, 0, '
                             }
                             break;
                             
+                        case Contracts.CONTRACT_TYPE_NOSCOPE:
+                            if (other.lastDamageSource == DAMAGE_SOURCE_RIFLE) {
+                                value_increment += 1;
+                            }
+                            break;
+                            
                         case Contracts.CONTRACT_TYPE_AUTOGUN_KILLS:
                         case Contracts.CONTRACT_TYPE_AUTOGUN_STREAK:
                             if (other.lastDamageSource == DAMAGE_SOURCE_SENTRYTURRET) {
@@ -61,6 +73,13 @@ object_event_add(Character, ev_destroy, 0, '
                                 value_increment += 1;
                             }
                             break;
+                            
+                        case Contracts.CONTRACT_TYPE_FLYING_STICKY:
+                            if (other.contracts__hit_by_flying_sticky_this_frame) {
+                                value_increment += 1;
+                            }
+                            break;
+                            
                             
                         case Contracts.CONTRACT_TYPE_UBERED_KILLS:
                         case Contracts.CONTRACT_TYPE_UBERED_STREAK:
@@ -157,6 +176,7 @@ object_event_add(Contract, ev_create, 0, '
     prev_caps = 0;
     prev_dom_count = 0;
     burn_duration = 0;
+    bubble_blocks = 0;
 ');
 with (Contract) {
     prev_healing = 0;
@@ -164,6 +184,7 @@ with (Contract) {
     prev_caps = 0;
     prev_dom_count = 0;
     burn_duration = 0;
+    bubble_blocks = 0;
 }
 
 object_event_add(Contract, ev_step, ev_step_end, '
@@ -182,6 +203,7 @@ object_event_add(Contract, ev_step, ev_step_end, '
         prev_caps = 0;
         prev_dom_count = 0;
         burn_duration = 0;
+        bubble_blocks = 0;
         
         exit;
     }
@@ -251,6 +273,15 @@ object_event_add(Contract, ev_step, ev_step_end, '
             }
             break;
             
+        case Contracts.CONTRACT_TYPE_BUBBLE_SHIELD:
+            if (bubble_blocks >= 10) {
+                var modifier;
+                modifier = floor(bubble_blocks / 10);
+                value_increment += modifier;
+                bubble_blocks -= modifier * 10;
+            }
+            break;
+            
         case Contracts.CONTRACT_TYPE_UBERED_STREAK:
             if (owner.object != -1)
             if (owner.object.contracts__time_since_uber > Contracts.UBER_TIMER_CUTOFF) {
@@ -260,6 +291,41 @@ object_event_add(Contract, ev_step, ev_step_end, '
     }
 ');
 
+
+// CONTRACT_TYPE_BUBBLE_SHIELD
+var bubble_shield_script;
+bubble_shield_script = '
+    if (team != other.team) {
+        with (Contracts.Contract) {
+            if (contract_type == Contracts.CONTRACT_TYPE_BUBBLE_SHIELD)
+            if (!completed)
+            if (owner == other.ownerPlayer) {
+                bubble_blocks += 1;
+            }
+        }
+    }
+';
+object_event_add(Bubble, ev_collision, Shot, 'if(!other.perseverant)' + bubble_shield_script);
+object_event_add(Bubble, ev_collision, Needle, bubble_shield_script);
+object_event_add(Bubble, ev_collision, Flare, bubble_shield_script);
+object_event_add(Bubble, ev_collision, Mine, bubble_shield_script);
+
+
+// CONTRACT_TYPE_FLYING_STICKY
+object_event_add(Mine, ev_destroy, 0, '
+    if (!exploded) exit;
+    if (stickied) exit;
+    
+    with (Character) {
+        if (team != other.team)
+        if (distance_to_object(other) < other.blastRadius)
+        {
+            if (1 - distance_to_object(other)/other.blastRadius <= 0.25 and other.splashThreshhold)
+                continue;
+            contracts__hit_by_flying_sticky_this_frame = true;
+        }
+    }
+');
 
 // dealDamage( sourcePlayer, damagedObject, damageDealt )
 global.dealDamageFunction += '

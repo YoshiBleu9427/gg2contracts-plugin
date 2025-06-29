@@ -160,6 +160,9 @@ object_event_add(ViewContractsMenu, ev_draw, 0, '
             case Contracts.CONTRACT_TYPE_AUTOGUN_STREAK:
             case Contracts.CONTRACT_TYPE_FLARE_KILLS:
             case Contracts.CONTRACT_TYPE_GUN_KILLS:
+            case Contracts.CONTRACT_TYPE_FLYING_STICKY:
+            case Contracts.CONTRACT_TYPE_BUBBLE_SHIELD:
+            case Contracts.CONTRACT_TYPE_NOSCOPE:
                 completable_by_any_class = false;
                 break;
         }
