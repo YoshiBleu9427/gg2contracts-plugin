@@ -140,6 +140,7 @@ object_event_add(Character, ev_destroy, 0, '
                         case Contracts.CONTRACT_TYPE_KILL_STREAK:
                         case Contracts.CONTRACT_TYPE_HEAL_STREAK:
                             value_increment = 0;
+                            scored_healing = 0;
                             break;
                     }
                 }
@@ -171,7 +172,8 @@ object_event_add(Sentry, ev_destroy, 0, '
 
 
 object_event_add(Contract, ev_create, 0, '
-    prev_healing = 0;
+    prev_healing_stat = 0;
+    scored_healing = 0;
     prev_ubers = 0;
     prev_caps = 0;
     prev_dom_count = 0;
@@ -179,7 +181,8 @@ object_event_add(Contract, ev_create, 0, '
     bubble_blocks = 0;
 ');
 with (Contract) {
-    prev_healing = 0;
+    prev_healing_stat = 0;
+    scored_healing = 0;
     prev_ubers = 0;
     prev_caps = 0;
     prev_dom_count = 0;
@@ -198,7 +201,8 @@ object_event_add(Contract, ev_step, ev_step_end, '
     
     if (global.winners != -1) {
         // reset
-        prev_healing = 0;
+        prev_healing_stat = 0;
+        scored_healing = 0;
         prev_ubers = 0;
         prev_caps = 0;
         prev_dom_count = 0;
@@ -212,24 +216,25 @@ object_event_add(Contract, ev_step, ev_step_end, '
         case Contracts.CONTRACT_TYPE_HEAL_STREAK:
         case Contracts.CONTRACT_TYPE_HEALING:
             var heal_diff, modifier;
-            heal_diff = owner.stats[HEALING] - prev_healing;
+            heal_diff = owner.stats[HEALING] - prev_healing_stat;
+            prev_healing_stat = owner.stats[HEALING];
             
             // to prevent cheesing this contract by healing an unscathed target,
-            // we only take 25% of the healing into consideration
-            // do this by fast-forwarding the already-counted healing
+            // we only take 20% of the healing points into consideration
             if (owner.object != -1)
             if (owner.object.currentWeapon.object_index == Medigun)
             if (instance_exists(owner.object.currentWeapon.healTarget))
             if (owner.object.currentWeapon.healTarget.object != -1)
-            if (owner.object.currentWeapon.healTarget.object.hp == owner.object.currentWeapon.healTarget.object.maxHp)
-            if (owner.object.currentWeapon.healTarget.object.timeUnscathed > 4) {
-                prev_healing += 0.75 * heal_diff;
+            if (owner.object.currentWeapon.healTarget.object.hp == owner.object.currentWeapon.healTarget.object.maxHp) {
+                heal_diff *= 0.2;
             }
+
+            scored_healing += heal_diff;
             
-            if (heal_diff >= 100) {
-                modifier = floor(heal_diff / 100);
+            if (scored_healing >= 100) {
+                modifier = floor(scored_healing / 100);
                 value_increment += modifier;
-                prev_healing += modifier * 100;
+                scored_healing -= modifier * 100;
             }
             break;
             
