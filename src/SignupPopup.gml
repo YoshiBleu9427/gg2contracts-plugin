@@ -1,5 +1,4 @@
 SignupPopup = object_add();
-object_set_persistent(SignupPopup, true);
 object_set_depth(SignupPopup, -105000);
 object_set_sprite(SignupPopup, img_paula_icon);
 
@@ -10,6 +9,11 @@ object_event_add(SignupPopup, ev_create, 0, '
 ');
 
 object_event_add(SignupPopup, ev_step, ev_step_end, '
+    if (global.myself == -1) {
+        instance_destroy();
+        exit;
+    }
+    
     visible = (global.myself.object != -1);
     x = view_xview[0] + 48;
     y = view_yview[0] + 80;
