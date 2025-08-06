@@ -82,6 +82,7 @@ CMD_STATE_EXPECT_COMPLETED_CONTRACT_COUNT = 3;
 CMD_STATE_EXPECT_COMPLETED_CONTRACT_DATA = 4;
 CMD_STATE_EXPECT_NEW_CONTRACT_COUNT = 5;
 CMD_STATE_EXPECT_NEW_CONTRACT_DATA = 6;
+CMD_STATE_EXPECT_REWARDS = 7;
 
 
 
@@ -432,7 +433,7 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
         case Contracts.CMD_STATE_EXPECT_COUNT:
             contract_count = read_ubyte(backend_socket);
             command_state = Contracts.CMD_STATE_EXPECT_RESPONSE;
-            expected_byte_count += 21 * contract_count;
+            expected_byte_count += 21 * contract_count + 2;
             break;
             
         case Contracts.CMD_STATE_EXPECT_RESPONSE:
@@ -496,6 +497,22 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_SERVER_RECEIVE
             }
             buffer_destroy(pluginPacketBuffer);
             
+            rewards_length = read_ushort(backend_socket);
+            if (rewards_length > 0) {
+                command_state = Contracts.CMD_STATE_EXPECT_REWARDS;
+                expected_byte_count += rewards_length;
+            } else {
+                running_handler_event = noone;
+            }
+            break;
+            
+        case Contracts.CMD_STATE_EXPECT_REWARDS:
+            var contracts_rewards;
+            if (rewards_length > 0) {
+                contracts_rewards = read_string(backend_socket, rewards_length)
+                _player.contracts__rewards_string = contracts_rewards;
+                execute_string(Contracts.updatePlayerRewardsScript, _player);
+            }
             running_handler_event = noone;
             break;
     }

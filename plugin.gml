@@ -44,3 +44,4 @@ execute_file(directory + "\src\contract_rules.gml");
 execute_file(directory + "\src\menus.gml");
 execute_file(directory + "\src\ContractTracker.gml");
 execute_file(directory + "\src\SignupPopup.gml");
+execute_file(directory + "\src\rewards.gml");
