@@ -2,6 +2,7 @@ ErrorLog = object_add();
 object_set_persistent(ErrorLog, true);
 
 EVT_ERROR_LOG = ev_user0;
+EVT_ERROR_LOG_SILENT = ev_user2;
 EVT_ERROR_DUMP = ev_user1;
 
 ERROR_FILE_PATH = working_directory + "/contracts_error.log"
@@ -27,6 +28,15 @@ object_event_add(ErrorLog, ev_other, EVT_ERROR_LOG, '
         }
     } else {
         show_error("[CONTRACTS ERROR] " + log, false);
+    }
+');
+
+object_event_add(ErrorLog, ev_other, EVT_ERROR_LOG_SILENT, '
+    ds_list_add(logs, log);
+    
+    with (instance_create(0, 0, NoticeO)) {
+        notice = NOTICE_CUSTOM;
+        message = "[CONTRACTS ERROR] " + other.log;
     }
 ');
 
