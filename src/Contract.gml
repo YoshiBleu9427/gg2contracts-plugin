@@ -141,10 +141,6 @@ object_event_add(Contract, ev_step, ev_step_normal, '
     if (!global.isHost) {
         exit;
     }
-    if (global.winners != -1) {
-        // nothing to sync after round ends
-        exit;
-    }
     if (owner == noone) {
         exit;
     }

@@ -270,7 +270,7 @@ object_event_add(PluginNetworker, ev_step, ev_step_normal, '
                     if (!ds_map_exists(Contracts.contracts_by_uuid, contract_id)) {
                         with (Contracts.errorLog) {
                             log = "Contracts plugin error: server wants to sync unknown contract " + string(hex(contract_id));
-                            event_perform(ev_other, Contracts.EVT_ERROR_LOG);
+                            event_perform(ev_other, Contracts.EVT_ERROR_LOG_SILENT);
                         }
                     } else {
                         var syncing_contract;
