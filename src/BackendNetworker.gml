@@ -20,7 +20,7 @@ object_set_persistent(ServerBackendNetworker, true);
  *
  *   ----------------------------------------
  */
-NET_BACK_HELLO_UUID = unhex("ca3db0d5429eb179b1cdb08af534787a")
+NET_BACK_HELLO_UUID = unhex("d26a114292f5496d860ff90b5d0fa94e")
 
 NET_BACK_REQ_HELLO                  = 0
 NET_BACK_REQ_LOGIN                  = 1
