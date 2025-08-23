@@ -62,9 +62,9 @@ rewards_paulahead_default = sprite_add(directory + "\images\rewards\paulahead_ge
 rewards_paulahead_demoman = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadDemomanS.png", 1, false, false, 4, 8);
 rewards_paulahead_sandwich = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadOmnomnomnomS_strip32.png", 32, false, false, 4, 8);
 rewards_paulahead_pyro = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadPyroS.png", 1, false, false, 4, 8);
-rewards_paulahead_pyrotaunt = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadPyroTauntS_strip10.png", 1, false, false, 4, 8);
+rewards_paulahead_pyrotaunt = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadPyroTauntS_strip10.png", 10, false, false, 4, 8);
 rewards_paulahead_scout = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadScoutS.png", 1, false, false, 4, 8);
-rewards_paulahead_soldiertaunt = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadSoldierTauntS_strip16.png", 1, false, false, 4, 8);
+rewards_paulahead_soldiertaunt = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadSoldierTauntS_strip16.png", 16, false, false, 4, 8);
 rewards_paulahead_spy = sprite_add(directory + "\images\rewards\paulahead_gear\PaulaHeadSpyS.png", 1, false, false, 4, 8);
 
 var gearSpec, i;
