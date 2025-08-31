@@ -608,6 +608,15 @@ object_event_add(ServerBackendNetworker, ev_other, EVT_HANDLE_SRV_GAME_DATA, '
                 contract = ds_map_find_value(Contracts.contracts_by_uuid, contract_uuid)
                 if (contract != 0) {
                     contract.completed = true;
+                    // from the server POV, it should be safe to delete because
+                    // we are about to send the client the uuid of the completed
+                    // contract, and after that nobody will ever need to hear from
+                    // a completed contract ever again.
+                    // only case where its not safe to delete is if its the host
+                    // because then the tracker gets mad
+                    if (contract.owner != global.myself) {
+                        with(contract) instance_destroy();
+                    }
                 } else {
                     // this can happen for contracts of a player who left
                     // TODO handle error maybe?

@@ -164,6 +164,8 @@ object_event_add(Contract, ev_step, ev_step_normal, '
 ');
 
 object_event_add(Contract, ev_other, EVT_CONTRACT_ON_MAP_END, '
+    if (completed) exit;
+    
     switch (contract_type) {
         
         // consolidate stats

@@ -193,6 +193,7 @@ with (Contract) {
 object_event_add(Contract, ev_step, ev_step_end, '
     if (!global.isHost) exit;
     if (owner == noone) exit;
+    if (completed) exit;
     
     if ((value + value_increment) >= target_value) {
         // consider it completed and hold on to that value
