@@ -51,6 +51,20 @@ global.HaxxyBadges[originalMedalCount + 7] = 'Cnt_medal_paulaStatue';
 /**
  *   ----------------------------------------
  *
+ *      Angels
+ *
+ *   ----------------------------------------
+ */
+rewards_angel_paulaStatue = sprite_add(directory + "\images\rewards\angel_paulaStatue.png", 1, false, false, 6, 6);
+rewards_angel_fly = sprite_add(directory + "\images\rewards\angel_fly_strip10.png", 10, true, false, 8, 8);
+rewards_angel_star1 = sprite_add(directory + "\images\rewards\angel_star1.png", 1, true, false, 8, 8);
+rewards_angel_redteam = sprite_add(directory + "\images\rewards\angel_redteam.png", 1, false, false, 8, 8);
+rewards_angel_blueteam = sprite_add(directory + "\images\rewards\angel_blueteam.png", 1, false, false, 8, 8);
+
+
+/**
+ *   ----------------------------------------
+ *
  *      Gear specs
  *
  *   ----------------------------------------
@@ -104,6 +118,76 @@ gearSpecClassOverlayOffset(gearSpec, CLASS_ENGINEER, 0, 2);
 gearSpecClassOverlayOffset(gearSpec, CLASS_SPY, 2, 2);
 
 gearSpecApply(gearSpec, Contracts.GEAR_PAULA_BH);
+gearSpecDestroy(gearSpec);
+
+
+
+GEAR_DUMB_HAT = "DumbHat";
+rewards_dumbhat = sprite_add(directory + "\images\rewards\hat_dumb.png", 1, false, false, 6, 2);
+gearSpec = gearSpecCreate();
+gearSpecDefaultOverlay(gearSpec, Contracts.rewards_dumbhat, Contracts.rewards_dumbhat, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_QUOTE, 8, -8);
+gearSpecApply(gearSpec, Contracts.GEAR_DUMB_HAT);
+gearSpecDestroy(gearSpec);
+
+GEAR_FLOWER_BROOCH = "FlowerBrooch";
+rewards_flower_brooch = sprite_add(directory + "\images\rewards\flower_brooch.png", 1, true, false, 4, 4);
+gearSpec = gearSpecCreate();
+gearSpecDefaultOverlay(gearSpec, Contracts.rewards_flower_brooch, Contracts.rewards_flower_brooch, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_QUOTE, 4, -2);
+gearSpecApply(gearSpec, Contracts.GEAR_FLOWER_BROOCH);
+gearSpecDestroy(gearSpec);
+
+
+GEAR_PUMPKIN_EPIC = "EpicPumpkinHead";
+rewards_pumpkinepic = sprite_add(directory + "\images\rewards\pumpkinheads\epic.png", 1, true, false, 2, 6);
+rewards_pumpkinepic_topless = sprite_add(directory + "\images\rewards\pumpkinheads\epic_topless.png", 1, true, false, 2, 6);
+rewards_pumpkinepic_open = sprite_add(directory + "\images\rewards\pumpkinheads\epic_open.png", 1, true, false, 2, 6);
+gearSpec = gearSpecCreate();
+gearSpecDefaultOverlay(gearSpec, Contracts.rewards_pumpkinepic, Contracts.rewards_pumpkinepic, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_SCOUT, 0, -2);
+gearSpecClassOverlayOffset(gearSpec, CLASS_PYRO, 2, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_SOLDIER, 0, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_HEAVY, 0, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_DEMOMAN, 0, -2);
+gearSpecClassOverlayOffset(gearSpec, CLASS_ENGINEER, 0, -2);
+gearSpecClassOverlayOffset(gearSpec, CLASS_SPY, 2, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 6, Contracts.rewards_pumpkinepic_open, Contracts.rewards_pumpkinepic_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 7, Contracts.rewards_pumpkinepic_open, Contracts.rewards_pumpkinepic_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 12, Contracts.rewards_pumpkinepic_open, Contracts.rewards_pumpkinepic_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 13, Contracts.rewards_pumpkinepic_open, Contracts.rewards_pumpkinepic_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 18, Contracts.rewards_pumpkinepic_open, Contracts.rewards_pumpkinepic_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 19, Contracts.rewards_pumpkinepic_open, Contracts.rewards_pumpkinepic_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 24, Contracts.rewards_pumpkinepic_open, Contracts.rewards_pumpkinepic_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 25, Contracts.rewards_pumpkinepic_open, Contracts.rewards_pumpkinepic_open, 0);
+gearSpecClassOverlay(gearSpec, CLASS_SNIPER, Contracts.rewards_pumpkinepic_topless, Contracts.rewards_pumpkinepic_topless, 0);
+gearSpecApply(gearSpec, Contracts.GEAR_PUMPKIN_EPIC);
+gearSpecDestroy(gearSpec);
+
+
+GEAR_PUMPKIN_LEGENDARY = "LegendaryPumpkinHead";
+rewards_pumpkinlegendary = sprite_add(directory + "\images\rewards\pumpkinheads\legendary.png", 1, true, false, 2, 6);
+rewards_pumpkinlegendary_topless = sprite_add(directory + "\images\rewards\pumpkinheads\legendary_topless.png", 1, true, false, 2, 6);
+rewards_pumpkinlegendary_open = sprite_add(directory + "\images\rewards\pumpkinheads\legendary_open.png", 1, true, false, 2, 6);
+gearSpec = gearSpecCreate();
+gearSpecDefaultOverlay(gearSpec, Contracts.rewards_pumpkinlegendary, Contracts.rewards_pumpkinlegendary, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_SCOUT, 0, -2);
+gearSpecClassOverlayOffset(gearSpec, CLASS_PYRO, 2, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_SOLDIER, 0, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_HEAVY, 0, 0);
+gearSpecClassOverlayOffset(gearSpec, CLASS_DEMOMAN, 0, -2);
+gearSpecClassOverlayOffset(gearSpec, CLASS_ENGINEER, 0, -2);
+gearSpecClassOverlayOffset(gearSpec, CLASS_SPY, 2, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 6, Contracts.rewards_pumpkinlegendary_open, Contracts.rewards_pumpkinlegendary_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 7, Contracts.rewards_pumpkinlegendary_open, Contracts.rewards_pumpkinlegendary_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 12, Contracts.rewards_pumpkinlegendary_open, Contracts.rewards_pumpkinlegendary_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 13, Contracts.rewards_pumpkinlegendary_open, Contracts.rewards_pumpkinlegendary_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 18, Contracts.rewards_pumpkinlegendary_open, Contracts.rewards_pumpkinlegendary_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 19, Contracts.rewards_pumpkinlegendary_open, Contracts.rewards_pumpkinlegendary_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 24, Contracts.rewards_pumpkinlegendary_open, Contracts.rewards_pumpkinlegendary_open, 0);
+gearSpecFrameOverlay(gearSpec, CLASS_HEAVY, "Omnomnomnom", 25, Contracts.rewards_pumpkinlegendary_open, Contracts.rewards_pumpkinlegendary_open, 0);
+gearSpecClassOverlay(gearSpec, CLASS_SNIPER, Contracts.rewards_pumpkinlegendary_topless, Contracts.rewards_pumpkinlegendary_topless, 0);
+gearSpecApply(gearSpec, Contracts.GEAR_PUMPKIN_LEGENDARY);
 gearSpecDestroy(gearSpec);
 
 
@@ -170,8 +254,40 @@ object_event_add(RewardAuthChecker, ev_step, ev_step_normal, '
 object_event_add(Character, ev_create, 0, '
     if(
        !hasClassReward(player, "BH") and !hasClassReward(player, "TopHatMonocle_") and !hasClassReward(player, "TopHat_")
-       and hasClassReward(player, "Cnt_PH") and player.class != CLASS_QUOTE
     ) {
-        ds_list_insert(gearList, 0, Contracts.GEAR_PAULA_BH);
+		if (hasClassReward(player, "Cnt_PH") and player.class != CLASS_QUOTE) {
+			ds_list_insert(gearList, 0, Contracts.GEAR_PAULA_BH);
+		} else if (hasClassReward(player, "Cnt_Pumpkin2") and player.class != CLASS_QUOTE) {
+			ds_list_insert(gearList, 0, Contracts.GEAR_PUMPKIN_LEGENDARY);
+		} else if (hasClassReward(player, "Cnt_Pumpkin1") and player.class != CLASS_QUOTE) {
+			ds_list_insert(gearList, 0, Contracts.GEAR_PUMPKIN_EPIC);
+		} else if (hasReward(player, "Cnt_DumbHat") and player.class == CLASS_QUOTE) {
+			ds_list_insert(gearList, 0, Contracts.GEAR_DUMB_HAT);
+		}
+    }
+	if (hasReward(player, "Cnt_FlowerBrooch") and player.class == CLASS_QUOTE) {
+		ds_list_insert(gearList, 0, Contracts.GEAR_FLOWER_BROOCH);
+		ds_list_add(gearList, Contracts.GEAR_FLOWER_BROOCH);
+	}
+	
+    if (hasReward(player, "Cnt_angel_pstatue"))
+    {
+        demon = Contracts.rewards_angel_paulaStatue;
+    }
+    else if (hasReward(player, "Cnt_angel_star1"))
+    {
+        demon = Contracts.rewards_angel_star1;
+    }
+    else if (hasReward(player, "Cnt_angel_fly"))
+    {
+        demon = Contracts.rewards_angel_fly;
+    }
+    else if (hasReward(player, "Cnt_angel_teamicon"))
+    {
+		if (player.team == TEAM_RED) {
+			demon = Contracts.rewards_angel_redteam;
+		} else {
+			demon = Contracts.rewards_angel_blueteam;
+		}
     }
 ');
